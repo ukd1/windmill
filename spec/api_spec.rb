@@ -14,5 +14,6 @@ describe 'The osquery TLS api' do
     expect(last_response).to be_ok
     json = JSON.parse(last_response.body)
     expect(json["status"]).to eq("running")
+    expect(json["timestamp"]).to match(/^\d{4}-\d{2}-\d{2}\ (\d{2}:){2}\d{2}\ [+-]\d{4}$/)
   end
 end
