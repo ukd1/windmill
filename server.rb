@@ -29,3 +29,7 @@ end
 post '/api/config' do
   EXAMPLE_CONFIG.to_json
 end
+
+post '/' do
+  puts params
+end
