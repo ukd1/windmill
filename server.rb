@@ -20,9 +20,7 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
-  if ENV['RACK_ENV'] == "development"
-    puts params
-  end
+  puts params
   ENROLL_RESPONSE.to_json
 end
 
@@ -32,4 +30,5 @@ end
 
 post '/' do
   puts params
+  params
 end
