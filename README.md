@@ -14,3 +14,9 @@ osquery nodes can set and have the server choose the right config for them.
 
 * The reference implementation in python: https://github.com/facebook/osquery/blob/master/tools/tests/test_http_server.py
 * The documentation: https://github.com/facebook/osquery/blob/master/docs/wiki/deployment/remote.md
+
+## Running tests
+
+The tests are written in RSpec and make use of the `rack-test` gem. If you do a
+`bundle install` you should have that. So you can just run `rspec spec` to run
+the tests.
