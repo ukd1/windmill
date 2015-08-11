@@ -16,4 +16,18 @@ describe 'The osquery TLS api' do
     expect(json["status"]).to eq("running")
     expect(json["timestamp"]).to match(/^\d{4}-\d{2}-\d{2}\ (\d{2}:){2}\d{2}\ [+-]\d{4}$/)
   end
+
+  it "enrolls a node" do
+    post '/api/enroll'
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("node_key")
+  end
+
+  it "returns a configuration" do
+    post '/api/config'
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("schedule")
+  end
 end
