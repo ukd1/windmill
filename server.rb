@@ -7,7 +7,7 @@ ENROLL_RESPONSE = {
 
 EXAMPLE_CONFIG = {
     "schedule": {
-        "tls_proc": {"query": "select * from processes", "interval": 0},
+        "tls_proc": {"query": "select * from processes", "interval": 10},
     }
 }
 
@@ -20,7 +20,6 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
-  puts params
   ENROLL_RESPONSE.to_json
 end
 
@@ -29,6 +28,5 @@ post '/api/config' do
 end
 
 post '/' do
-  puts params
-  params
+  {}.to_json
 end
