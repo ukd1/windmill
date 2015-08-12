@@ -1,6 +1,7 @@
 require_relative '../server.rb'  # <-- your sinatra app
 require 'rspec'
 require 'rack/test'
+require 'spec_helper'
 
 describe 'The osquery TLS api' do
   include Rack::Test::Methods
@@ -24,10 +25,21 @@ describe 'The osquery TLS api' do
     expect(json).to have_key("node_key")
   end
 
-  it "returns a configuration" do
+  it "returns a default configuration" do
     post '/api/config'
     expect(last_response).to be_ok
-    json = JSON.parse(last_response.body)
-    expect(json).to have_key("schedule")
+    expect(last_response.body).to match(/This is the default test file/)
+  end
+
+  it "returns a named configuration" do
+    post '/api/config/web'
+    expect(last_response).to be_ok
+    expect(last_response.body).to match(/This is the web test file/)
+  end
+
+  it "returns the default config when a named config cannot be found" do
+    post '/api/config/unknown'
+    expect(last_response).to be_ok
+    expect(last_response.body).to match(/This is the default test file/)
   end
 end

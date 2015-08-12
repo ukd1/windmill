@@ -5,12 +5,6 @@ ENROLL_RESPONSE = {
     "node_key": "this_is_a_node_secret"
 }
 
-EXAMPLE_CONFIG = {
-    "schedule": {
-        "tls_proc": {"query": "select * from processes", "interval": 10},
-    }
-}
-
 get '/status' do
   "running at #{Time.now}"
 end
@@ -24,7 +18,26 @@ post '/api/enroll' do
 end
 
 post '/api/config' do
-  EXAMPLE_CONFIG.to_json
+  if ENV["RACK_ENV"] == "test"
+    config_folder = "test_files"
+  else
+    config_folder = "osquery_configs"
+  end
+  File.read(File.join(config_folder, "default.conf"))
+end
+
+post '/api/config/:name' do
+  if ENV["RACK_ENV"] == "test"
+    config_folder = "test_files"
+  else
+    config_folder = "osquery_configs"
+  end
+  file_to_get = File.join(config_folder, "#{params['name']}.conf")
+  if File.exist?(file_to_get)
+    File.read(file_to_get)
+  else
+    File.read(File.join(config_folder, "default.conf"))
+  end
 end
 
 post '/' do
