@@ -38,6 +38,21 @@ file include:
 Then you can start osqueryd (on linux) with a simple `/etc/init.d/osqueryd start`
 or `service start osqueryd`
 
+## Serving configuration files
+The `osquery_configs` folder holds all the configuration files you want to send
+to your osquery endpoints. At a minimum, you must have an osquery config file
+in that folder named `default.conf`. This is the file that gets delivered to an
+endpoint that sends a POST request to `/api/config` and is also the fallback
+configuration if an endpoint sends a POST request to a named path that doesn't
+have an associated file (`/api/config/unknown`)
+
+You can serve different configuration files to different server types by putting
+multiple configuration files into the `osquery_configs` folder and configuring your
+osquery endpoints with a different `config_tls_endpoint` value in `/etc/osquery/osquery.flags`.
+The TLS server will try to match the name of the endpoint with the name of a file.
+If your osquery endpoint sends a POST request to `/api/config/blahblahblah` then the
+TLS server will look in `osquery_configs` for a file named blahblahblah.conf.
+
 ## Some features I'd like to have
 get enroll secret from environment vars. Makes it easy to deploy the code
 without having to stick a file into the repo.
