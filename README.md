@@ -19,7 +19,7 @@ for osqueryd to look to your server.
 --config_tls_endpoint=/api/config
 --config_tls_refresh=14400
 --enroll_tls_endpoint=/api/enroll
---enroll_secret_path=/etc/osquery.secret
+--enroll_secret_path=/etc/osquery/osquery.secret
 ```
 
 The lines above seem to be the minimum necessary to make osquery pull config
@@ -38,6 +38,17 @@ file include:
 Then you can start osqueryd (on linux) with a simple `/etc/init.d/osqueryd start`
 or `service start osqueryd`
 
+## Enrolling osquery endpoints
+The osquery endpoints will reach out to the TLS server and send a POST to `/api/enroll`
+with a `node_secret` value that it read from it's own filesystem (`/etc/osquery/osquery.secret`
+if you followed the `osquery.flags` file above). The value in that file must match
+the node secret being used by the TLS server. The TLS server takes this value from an
+environment variable named NODE_ENROLL_SECRET. If you have not set that variable
+then it defaults to "valid_test".
+
+If the server sends a valid node_secret then it will receive a node key that it
+can use to pull its configuration from the server.
+
 ## Serving configuration files
 The `osquery_configs` folder holds all the configuration files you want to send
 to your osquery endpoints. At a minimum, you must have an osquery config file
@@ -52,11 +63,6 @@ osquery endpoints with a different `config_tls_endpoint` value in `/etc/osquery/
 The TLS server will try to match the name of the endpoint with the name of a file.
 If your osquery endpoint sends a POST request to `/api/config/blahblahblah` then the
 TLS server will look in `osquery_configs` for a file named blahblahblah.conf.
-
-## Some features I'd like to have
-get enroll secret from environment vars. Makes it easy to deploy the code
-without having to stick a file into the repo.
-
 
 ## Helpful links
 

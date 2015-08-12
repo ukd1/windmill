@@ -5,6 +5,10 @@ ENROLL_RESPONSE = {
     "node_key": "this_is_a_node_secret"
 }
 
+FAILED_ENROLL_RESPONSE = {
+    "node_invalid": true
+}
+
 def config_getter(filename="default")
   if ENV["RACK_ENV"] == "test"
     config_folder = "test_files"
@@ -30,7 +34,12 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
-  ENROLL_RESPONSE.to_json
+  enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
+  if params['enroll_secret'] == enroll_key
+    ENROLL_RESPONSE.to_json
+  else
+    FAILED_ENROLL_RESPONSE.to_json
+  end
 end
 
 post '/api/config' do

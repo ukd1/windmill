@@ -18,11 +18,19 @@ describe 'The osquery TLS api' do
     expect(json["timestamp"]).to match(/^\d{4}-\d{2}-\d{2}\ (\d{2}:){2}\d{2}\ [+-]\d{4}$/)
   end
 
-  it "enrolls a node" do
-    post '/api/enroll'
+  it "enrolls a node with a valid node secret" do
+    post '/api/enroll', enroll_secret: "valid_test"
     expect(last_response).to be_ok
     json = JSON.parse(last_response.body)
     expect(json).to have_key("node_key")
+  end
+
+  it "rejects a node with an invalid node secret" do
+    post '/api/enroll', enroll_secret: "invalid_test"
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("node_invalid")
+    expect(json["node_invalid"]).to eq(true)
   end
 
   it "returns a default configuration" do
