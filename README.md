@@ -57,9 +57,6 @@ TLS server will look in `osquery_configs` for a file named blahblahblah.conf.
 get enroll secret from environment vars. Makes it easy to deploy the code
 without having to stick a file into the repo.
 
-Choose your config parameter. I might want to use a different configuration
-for different kinds of servers. It would be cool to have a parameter that the
-osquery nodes can set and have the server choose the right config for them.
 
 ## Helpful links
 
