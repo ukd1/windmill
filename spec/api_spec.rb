@@ -18,14 +18,14 @@ describe 'The osquery TLS api' do
     expect(json["timestamp"]).to match(/^\d{4}-\d{2}-\d{2}\ (\d{2}:){2}\d{2}\ [+-]\d{4}$/)
   end
 
-  it "enrolls a node with a valid node secret" do
+  it "enrolls a node with a valid enroll secret" do
     post '/api/enroll', enroll_secret: "valid_test"
     expect(last_response).to be_ok
     json = JSON.parse(last_response.body)
     expect(json).to have_key("node_key")
   end
 
-  it "rejects a node with an invalid node secret" do
+  it "rejects a node with an invalid enroll secret" do
     post '/api/enroll', enroll_secret: "invalid_test"
     expect(last_response).to be_ok
     json = JSON.parse(last_response.body)
@@ -33,21 +33,31 @@ describe 'The osquery TLS api' do
     expect(json["node_invalid"]).to eq(true)
   end
 
-  it "returns a default configuration" do
-    post '/api/config'
+  it "returns a default configuration with a valid node secret" do
+    post '/api/config', node_key: "valid_test"
     expect(last_response).to be_ok
     expect(last_response.body).to match(/This is the default test file/)
   end
 
-  it "returns a named configuration" do
-    post '/api/config/web'
+  it "returns a named configuration with a valid node secret" do
+    post '/api/config/web', node_key: "valid_test"
     expect(last_response).to be_ok
     expect(last_response.body).to match(/This is the web test file/)
   end
 
-  it "returns the default config when a named config cannot be found" do
-    post '/api/config/unknown'
+  it "returns the default config when a named config cannot be found with a valid node secret" do
+    post '/api/config/unknown', node_key: "valid_test"
     expect(last_response).to be_ok
     expect(last_response.body).to match(/This is the default test file/)
+  end
+
+  it "rejects a request for configuration from a node with an invalid node secret" do
+    ['/api/config', '/api/config/web', '/api/config/unknown'].each do |path|
+      post path, node_key: "invalid_test"
+      expect(last_response).to be_ok
+      json = JSON.parse(last_response.body)
+      expect(json).to have_key("node_invalid")
+      expect(json["node_invalid"]).to eq(true)
+    end
   end
 end

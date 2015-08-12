@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require 'securerandom'
 
 ENROLL_RESPONSE = {
     "node_key": "this_is_a_node_secret"
@@ -25,6 +26,32 @@ def config_getter(filename="default")
   end
 end
 
+def valid_node_key?(in_key)
+  keys = File.readlines("node_keys.txt").map {|x| x.strip}
+  if keys.include?(in_key)
+    true
+  else
+    false
+  end
+end
+
+def valid_enroll_key?(inKey)
+  enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
+  if inKey == enroll_key
+    true
+  else
+    false
+  end
+end
+
+def enroll_endpoint
+  node_secret = SecureRandom.uuid
+  savefile = open("node_keys.txt", "wb")
+  savefile.puts(node_secret)
+  savefile.close
+  {"node_key": node_secret}.to_json
+end
+
 get '/status' do
   "running at #{Time.now}"
 end
@@ -34,20 +61,27 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
-  enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
-  if params['enroll_secret'] == enroll_key
-    ENROLL_RESPONSE.to_json
+  if valid_enroll_key?(params['enroll_secret'])
+    enroll_endpoint
   else
     FAILED_ENROLL_RESPONSE.to_json
   end
 end
 
 post '/api/config' do
-  config_getter
+  if valid_node_key?(params["node_key"])
+    config_getter
+  else
+    FAILED_ENROLL_RESPONSE.to_json
+  end
 end
 
 post '/api/config/:name' do
-  config_getter(params['name'])
+  if valid_node_key?(params["node_key"])
+    config_getter(params['name'])
+  else
+    FAILED_ENROLL_RESPONSE.to_json
+  end
 end
 
 post '/' do
