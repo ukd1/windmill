@@ -4,7 +4,28 @@ A TLS endpoint for delivering osquery configuration files to nodes.
 
 ## Running the server
 
-To run the server just do `bundle install` and then `ruby server.rb`
+For security purposes, the software requires new endpoints to supply a shared
+secret which is found in an environment variable named NODE_ENROLL_SECRET.
+
+To run the server run the following commands. The first two commands should only
+need to be run once
+
+```
+bundle install
+rake db:migrate
+ruby server.rb
+```
+
+If you want to use the faster puma server you can run the app with this command:
+
+```
+puma -C puma.rb
+```
+
+Since this was written by a Heroku employee intending to run this on Heroku if
+you run the app in production the code expects an environment variable named
+DATABASE_URL with a url pointing to a postgres database. Absent that variable,
+production mode will fall back to a postgres database on localhost.
 
 ## Configuring osqueryd
 
@@ -23,8 +44,9 @@ for osqueryd to look to your server.
 ```
 
 The lines above seem to be the minimum necessary to make osquery pull config
-from a TLS endpoint. Additional lines that you may include in your osquery.flags
-file include:
+from a TLS endpoint. You will need to populate the `/etc/osqueryd/osqueryd.secret`
+file with the value of your NODE_ENROLL_SECRET environment variable. Additional
+lines that you may include in your osquery.flags file include:
 
 ```
 --database_path=/var/osquery/osquery.db
@@ -72,5 +94,10 @@ TLS server will look in `osquery_configs` for a file named blahblahblah.conf.
 ## Running tests
 
 The tests are written in RSpec and make use of the `rack-test` gem. If you do a
-`bundle install` you should have that. So you can just run `rspec spec` to run
+`bundle install` you should have that. Since the application uses a database to
+keep track of node_keys, you'll need to prepare the database before the first
+time you run the tests. `RACK_ENV=test rake db:migrate`. It shouldn't be that way
+and there is a bug waiting to be fixed: https://github.com/blackfist/windmill/issues/8
+
+So you can just run `rspec spec` to run
 the tests.
