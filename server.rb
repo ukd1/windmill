@@ -37,11 +37,12 @@ def config_getter(filename="default")
 end
 
 def valid_node_key?(in_key)
-  keys = File.readlines("node_keys.txt").map {|x| x.strip}
-  if keys.include?(in_key)
-    true
-  else
+  @endpoint = Endpoint.find_by node_key: in_key
+
+  if @endpoint.nil?
     false
+  else
+    true
   end
 end
 
@@ -56,10 +57,12 @@ end
 
 def enroll_endpoint(in_agent="none", in_ip="none")
   node_secret = SecureRandom.uuid
-  savefile = open("node_keys.txt", "wb")
-  savefile.puts(node_secret)
-  savefile.close
-  {"node_key": node_secret}.to_json
+  @endpoint = Endpoint.new node_key: node_secret, last_version: in_agent, last_ip: in_ip
+  if @endpoint.save
+    {"node_key": node_secret}.to_json
+  else
+    {"error":"error enrolling endpoint"}
+  end
 end
 
 get '/status' do
@@ -71,7 +74,13 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
-  params.merge!(JSON.parse(request.body.read))
+  # This next line is necessary because osqueryd does not send the
+  # enroll_secret as a POST param.
+  begin
+    params.merge(JSON.parse(request.body.read))
+  rescue
+  end
+
   if valid_enroll_key?(params['enroll_secret'])
     enroll_endpoint(request.user_agent, request.ip)
   else
@@ -80,6 +89,12 @@ post '/api/enroll' do
 end
 
 post '/api/config' do
+  # This next line is necessary because osqueryd does not send the
+  # enroll_secret as a POST param.
+  begin
+    params.merge(JSON.parse(request.body.read))
+  rescue
+  end
   if valid_node_key?(params["node_key"])
     config_getter
   else
@@ -88,6 +103,12 @@ post '/api/config' do
 end
 
 post '/api/config/:name' do
+  # This next line is necessary because osqueryd does not send the
+  # enroll_secret as a POST param.
+  begin
+    params.merge(JSON.parse(request.body.read))
+  rescue
+  end
   if valid_node_key?(params["node_key"])
     config_getter(params['name'])
   else
