@@ -1,6 +1,8 @@
 require 'sinatra'
+require 'sinatra/activerecord'
 require 'json'
 require 'securerandom'
+require_relative 'environments'
 
 ENROLL_RESPONSE = {
     "node_key": "this_is_a_node_secret"
@@ -9,6 +11,14 @@ ENROLL_RESPONSE = {
 FAILED_ENROLL_RESPONSE = {
     "node_invalid": true
 }
+
+class Endpoint < ActiveRecord::Base
+  # node_key, string
+  # last_version, string
+  # config_count, integer
+  # last_ip, string
+  # default ruby timestamps
+end
 
 def config_getter(filename="default")
   if ENV["RACK_ENV"] == "test"
@@ -35,16 +45,16 @@ def valid_node_key?(in_key)
   end
 end
 
-def valid_enroll_key?(inKey)
+def valid_enroll_key?(in_key)
   enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
-  if inKey == enroll_key
+  if in_key == enroll_key
     true
   else
     false
   end
 end
 
-def enroll_endpoint
+def enroll_endpoint(in_agent="none", in_ip="none")
   node_secret = SecureRandom.uuid
   savefile = open("node_keys.txt", "wb")
   savefile.puts(node_secret)
@@ -61,8 +71,9 @@ get '/api/status' do
 end
 
 post '/api/enroll' do
+  params.merge!(JSON.parse(request.body.read))
   if valid_enroll_key?(params['enroll_secret'])
-    enroll_endpoint
+    enroll_endpoint(request.user_agent, request.ip)
   else
     FAILED_ENROLL_RESPONSE.to_json
   end
