@@ -49,8 +49,10 @@ end
 def valid_enroll_key?(in_key)
   enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
   if in_key == enroll_key
+    puts "valid_enroll_key? - valid key detected" if ENV['OSQUERYDEBUG']
     true
   else
+    puts "valid_enroll_key? - key does not match #{ENV['NODE_ENROLL_SECRET']}" if ENV['OSQUERYDEBUG']
     false
   end
 end
@@ -77,7 +79,8 @@ post '/api/enroll' do
   # This next line is necessary because osqueryd does not send the
   # enroll_secret as a POST param.
   begin
-    params.merge(JSON.parse(request.body.read))
+    json_data = JSON.parse(request.body.read)
+    params.merge!(json_data)
   rescue
   end
 
@@ -92,7 +95,7 @@ post '/api/config' do
   # This next line is necessary because osqueryd does not send the
   # enroll_secret as a POST param.
   begin
-    params.merge(JSON.parse(request.body.read))
+    params.merge!(JSON.parse(request.body.read))
   rescue
   end
   if valid_node_key?(params["node_key"])
@@ -106,7 +109,7 @@ post '/api/config/:name' do
   # This next line is necessary because osqueryd does not send the
   # enroll_secret as a POST param.
   begin
-    params.merge(JSON.parse(request.body.read))
+    params.merge!(JSON.parse(request.body.read))
   rescue
   end
   if valid_node_key?(params["node_key"])
