@@ -84,6 +84,8 @@ post '/api/enroll' do
   rescue
   end
 
+  puts "POST:api/enroll - received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
+
   if valid_enroll_key?(params['enroll_secret'])
     enroll_endpoint(request.user_agent, request.ip)
   else
