@@ -12,6 +12,22 @@ describe 'The osquery TLS api' do
 
   valid_node_key = ""
 
+  it "sets a new client's config_count to zero" do
+    post '/api/enroll', {enroll_secret: "valid_test"}
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    client = Endpoint.find_by node_key: json['node_key']
+    expect(client.config_count).to eq(0)
+  end
+
+  it "counts how many times a client has pulled its config" do
+    client = Endpoint.last
+    config_count = client.config_count
+    post '/api/config', node_key: client.node_key
+    client.reload
+    expect(client.config_count).to eq(config_count + 1)
+  end
+
   it "returns a status" do
     get '/api/status'
     expect(last_response).to be_ok

@@ -37,11 +37,14 @@ def config_getter(filename="default")
 end
 
 def valid_node_key?(in_key)
+  puts "valid_node_key?: received key #{in_key}" if ENV['OSQUERYDEBUG']
   @endpoint = Endpoint.find_by node_key: in_key
 
   if @endpoint.nil?
+    puts "valid_node_key?: #{in_key} is not a valid key" if ENV['OSQUERYDEBUG']
     false
   else
+    puts "valid_node_key?: #{in_key} is a good key" if ENV['OSQUERYDEBUG']
     true
   end
 end
@@ -59,7 +62,7 @@ end
 
 def enroll_endpoint(in_agent="none", in_ip="none")
   node_secret = SecureRandom.uuid
-  @endpoint = Endpoint.new node_key: node_secret, last_version: in_agent, last_ip: in_ip
+  @endpoint = Endpoint.new node_key: node_secret, last_version: in_agent, last_ip: in_ip, config_count:0
   if @endpoint.save
     {"node_key": node_secret}.to_json
   else
@@ -101,6 +104,9 @@ post '/api/config' do
   rescue
   end
   if valid_node_key?(params["node_key"])
+    client = Endpoint.find_by node_key: params['node_key']
+    client.config_count += 1
+    client.save
     config_getter
   else
     FAILED_ENROLL_RESPONSE.to_json
@@ -115,6 +121,9 @@ post '/api/config/:name' do
   rescue
   end
   if valid_node_key?(params["node_key"])
+    client = Endpoint.find_by node_key: params['node_key']
+    client.config_count += 1
+    client.save
     config_getter(params['name'])
   else
     FAILED_ENROLL_RESPONSE.to_json
