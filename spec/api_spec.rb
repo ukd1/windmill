@@ -20,12 +20,28 @@ describe 'The osquery TLS api' do
     expect(client.config_count).to eq(0)
   end
 
+  it "sets a new clients last_config_time to nil" do
+    post '/api/enroll', {enroll_secret: "valid_test"}
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    client = Endpoint.find_by node_key: json['node_key']
+    expect(client.last_config_time).to eq(nil)
+  end
+
   it "counts how many times a client has pulled its config" do
     client = Endpoint.last
     config_count = client.config_count
     post '/api/config', node_key: client.node_key
     client.reload
     expect(client.config_count).to eq(config_count + 1)
+  end
+
+  it "updates the timestamp in last_config_time when a client pulls its config" do
+    client = Endpoint.last
+    config_time = client.last_config_time || 0
+    post '/api/config', node_key: client.node_key
+    client.reload
+    expect(client.last_config_time).to be > config_time
   end
 
   it "returns a status" do

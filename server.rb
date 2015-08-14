@@ -16,6 +16,7 @@ class Endpoint < ActiveRecord::Base
   # node_key, string
   # last_version, string
   # config_count, integer
+  # last_config_time, datetime
   # last_ip, string
   # default ruby timestamps
 end
@@ -106,6 +107,7 @@ post '/api/config' do
   if valid_node_key?(params["node_key"])
     client = Endpoint.find_by node_key: params['node_key']
     client.config_count += 1
+    client.last_config_time = Time.now
     client.save
     config_getter
   else
@@ -123,6 +125,7 @@ post '/api/config/:name' do
   if valid_node_key?(params["node_key"])
     client = Endpoint.find_by node_key: params['node_key']
     client.config_count += 1
+    client.last_config_time = Time.now
     client.save
     config_getter(params['name'])
   else

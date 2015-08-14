@@ -11,15 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150813150519) do
+ActiveRecord::Schema.define(version: 20150814192247) do
 
   create_table "endpoints", force: :cascade do |t|
-    t.string   "node_key",     null: false
+    t.string   "node_key",         null: false
     t.string   "last_version"
     t.integer  "config_count"
     t.string   "last_ip"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.datetime "last_config_time"
   end
 
 end
