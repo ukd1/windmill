@@ -1,0 +1,15 @@
+{
+  "name": "Windmill",
+  "description": "A TLS server for delivering config files to osquery endpoints",
+  "repository": "https://github.com/blackfist/windmill",
+  "keywords": ["osquery", "tls", "sinatra", "ruby"],
+  "scripts": {
+    "postdeploy": "bundle exec rake db:migrate"
+  },
+  "env": {
+    "NODE_ENROLL_SECRET": {
+      "description": "A shared secret key for validating osquery endpoints.",
+      "generator": "secret"
+    }
+  }
+}
