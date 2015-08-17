@@ -4,10 +4,6 @@ require 'json'
 require 'securerandom'
 require_relative 'environments'
 
-ENROLL_RESPONSE = {
-    "node_key": "this_is_a_node_secret"
-}
-
 FAILED_ENROLL_RESPONSE = {
     "node_invalid": true
 }
@@ -19,10 +15,44 @@ class Endpoint < ActiveRecord::Base
   # last_config_time, datetime
   # last_ip, string
   # default ruby timestamps
+
+  def config(filename="default")
+    if ENV["RACK_ENV"] == "test"
+      config_folder = "test_files"
+    else
+      config_folder = "osquery_configs"
+    end
+
+    file_to_get = File.join(config_folder, "#{filename}.conf")
+
+    if File.exist?(file_to_get)
+      File.read(file_to_get)
+    else
+      File.read(File.join(config_folder, "default.conf"))
+    end
+  end
 end
 
 class MissingEndpoint
+  attr_accessor :node_key, :config_count, :last_version,
+    :last_config_time, :last_ip
+  def initialize
+    @node_key = "missing endpoint"
+    @last_version = "missing endpoint"
+    @config_count = 0
+    @last_config_time = Time.now
+    @last_ip = "missing endpoint"
+  end
+
   def valid?
+    false
+  end
+
+  def config(filename="default")
+    FAILED_ENROLL_RESPONSE.to_json
+  end
+
+  def save
     false
   end
 end
@@ -38,22 +68,6 @@ class GuaranteedEndpoint
 
   def self.find_by(in_hash)
     Endpoint.find_by(in_hash) || MissingEndpoint.new
-  end
-end
-
-def config_getter(filename="default")
-  if ENV["RACK_ENV"] == "test"
-    config_folder = "test_files"
-  else
-    config_folder = "osquery_configs"
-  end
-
-  file_to_get = File.join(config_folder, "#{filename}.conf")
-
-  if File.exist?(file_to_get)
-    File.read(file_to_get)
-  else
-    File.read(File.join(config_folder, "default.conf"))
   end
 end
 
@@ -118,15 +132,11 @@ post '/api/config' do
     params.merge!(JSON.parse(request.body.read))
   rescue
   end
-  if valid_node_key?(params["node_key"])
-    client = Endpoint.find_by node_key: params['node_key']
-    client.config_count += 1
-    client.last_config_time = Time.now
-    client.save
-    config_getter
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
+  client = GuaranteedEndpoint.find_by node_key: params['node_key']
+  client.config_count += 1
+  client.last_config_time = Time.now
+  client.save
+  client.config
 end
 
 post '/api/config/:name' do
@@ -136,15 +146,11 @@ post '/api/config/:name' do
     params.merge!(JSON.parse(request.body.read))
   rescue
   end
-  if valid_node_key?(params["node_key"])
-    client = Endpoint.find_by node_key: params['node_key']
-    client.config_count += 1
-    client.last_config_time = Time.now
-    client.save
-    config_getter(params['name'])
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
+  client = GuaranteedEndpoint.find_by node_key: params['node_key']
+  client.config_count += 1
+  client.last_config_time = Time.now
+  client.save
+  client.config params['name']
 end
 
 post '/' do
