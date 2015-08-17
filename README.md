@@ -3,6 +3,10 @@
 A TLS endpoint for delivering osquery configuration files to nodes. The quickest
 way to get started is to [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
+If you deploy to Heroku using the button above, you'll need to view the
+environment variables to get the random secret that was generated for the NODE_ENROLL_SECRET
+used by the windmill application.
+
 ## Running the server
 
 For security purposes, the software requires new endpoints to supply a shared
