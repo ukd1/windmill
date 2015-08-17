@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150814192247) do
+ActiveRecord::Schema.define(version: 20150817123135) do
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "node_key",         null: false
@@ -22,5 +22,7 @@ ActiveRecord::Schema.define(version: 20150814192247) do
     t.datetime "updated_at",       null: false
     t.datetime "last_config_time"
   end
+
+  add_index "endpoints", ["node_key"], name: "index_endpoints_on_node_key"
 
 end
