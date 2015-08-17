@@ -10,6 +10,12 @@ FAILED_ENROLL_RESPONSE = {
 
 NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
 
+def logdebug(message)
+  if ENV['OSQUERYDEBUG']
+    puts "\n" + caller_locations(1,1)[0].label + ": " + message
+  end
+end
+
 class Endpoint < ActiveRecord::Base
   # node_key, string
   # last_version, string
@@ -19,12 +25,13 @@ class Endpoint < ActiveRecord::Base
   # default ruby timestamps
 
   def self.enroll(in_key, params)
-    puts "Endpoint.enroll: received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
+    logdebug "received enroll_secret " + in_key
 
     if in_key != NODE_ENROLL_SECRET
-      puts "Endpoint.enroll: invalid enroll_secret. Returning MissingEndpoint"  if ENV['OSQUERYDEBUG']
+      logdebug "invalid enroll_secret. Returning MissingEndpoint"
       MissingEndpoint.new
     else
+      logdebug "valid enroll_secret. Creating new endpoint"
       params.merge! node_key: SecureRandom.uuid, config_count: 0
       Endpoint.create params
     end
@@ -32,8 +39,10 @@ class Endpoint < ActiveRecord::Base
 
   def config(filename="default")
     if ENV["RACK_ENV"] == "test"
+      logdebug "test environment detected. Serve files from test_files"
       config_folder = "test_files"
     else
+      logdebug "serving files from osquery_configs"
       config_folder = "osquery_configs"
     end
 
@@ -42,6 +51,7 @@ class Endpoint < ActiveRecord::Base
     if File.exist?(file_to_get)
       File.read(file_to_get)
     else
+      logdebug "#{file_to_get} does not exist. Falling back to default."
       File.read(File.join(config_folder, "default.conf"))
     end
   end
@@ -76,6 +86,7 @@ class MissingEndpoint
   end
 
   def node_secret
+    logdebug "sending failed enroll response to client"
     FAILED_ENROLL_RESPONSE.to_json
   end
 
