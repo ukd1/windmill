@@ -19,7 +19,10 @@ class Endpoint < ActiveRecord::Base
   # default ruby timestamps
 
   def self.enroll(in_key, params)
+    puts "Endpoint.enroll: received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
+
     if in_key != NODE_ENROLL_SECRET
+      puts "Endpoint.enroll: invalid enroll_secret. Returning MissingEndpoint"  if ENV['OSQUERYDEBUG']
       MissingEndpoint.new
     else
       params.merge! node_key: SecureRandom.uuid, config_count: 0
@@ -108,8 +111,6 @@ post '/api/enroll' do
     params.merge!(json_data)
   rescue
   end
-
-  puts "POST:api/enroll - received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
 
   @endpoint = Endpoint.enroll params['enroll_secret'],
     last_version: request.user_agent,
