@@ -1,6 +1,7 @@
 # osquery-tls-server
 
-A TLS endpoint for delivering osquery configuration files to nodes.
+A TLS endpoint for delivering osquery configuration files to nodes. The quickest
+way to get started is to [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## Running the server
 
