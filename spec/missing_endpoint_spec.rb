@@ -18,4 +18,6 @@ describe 'MissingEndpoint instance methods' do
   it {should respond_to(:last_config_time)}
   it {should respond_to(:config)}
   it {should respond_to(:node_secret)}
+  it {should respond_to(:identifier)}
+  it {should respond_to(:group_label)}
 end

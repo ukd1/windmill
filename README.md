@@ -67,7 +67,7 @@ or `service start osqueryd`
 
 ## Enrolling osquery endpoints
 The osquery endpoints will reach out to the TLS server and send a POST to `/api/enroll`
-with a `node_secret` value that it read from it's own filesystem (`/etc/osquery/osquery.secret`
+with a `enroll_secret` value that it read from it's own filesystem (`/etc/osquery/osquery.secret`
 if you followed the `osquery.flags` file above). The value in that file must match
 the node secret being used by the TLS server. The TLS server takes this value from an
 environment variable named NODE_ENROLL_SECRET. If you have not set that variable
@@ -75,6 +75,17 @@ then it defaults to "valid_test".
 
 If the server sends a valid node_secret then it will receive a node key that it
 can use to pull its configuration from the server.
+
+You can also store extra information about the osquery endpoints by adding
+a host identifier and a group label to the front of the enroll secret stored in `/etc/osquery/osquery.secret`.
+The values are separated by a colon.
+
+### Example osquery.secret
+
+`www-1:web:bigrandomstringofcharactersforthewin`
+
+That will label the endpoint with an identifier of `www-1` and a group label of
+`web`
 
 ## Serving configuration files
 The `osquery_configs` folder holds all the configuration files you want to send

@@ -70,6 +70,28 @@ describe 'The osquery TLS api' do
     expect(json["node_invalid"]).to eq(true)
   end
 
+  it "records group name and identifier when a node enrolls with a valid enroll secret" do
+    post '/api/enroll', {enroll_secret: "hostname:groupname:valid_test"}
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("node_key")
+    valid_node_key = json["node_key"]
+    @endpoint = GuaranteedEndpoint.find_by node_key: valid_node_key
+    expect(@endpoint.identifier).to eq("hostname")
+    expect(@endpoint.group_label).to eq("groupname")
+  end
+
+  it "records just the group namewhen a node enrolls with a valid enroll secret" do
+    post '/api/enroll', {enroll_secret: "groupname:valid_test"}
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("node_key")
+    valid_node_key = json["node_key"]
+    @endpoint = GuaranteedEndpoint.find_by node_key: valid_node_key
+    expect(@endpoint.identifier).to eq(nil)
+    expect(@endpoint.group_label).to eq("groupname")
+  end
+
   it "returns a default configuration with a valid node secret" do
     post '/api/config', node_key: valid_node_key
     expect(last_response).to be_ok
