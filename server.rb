@@ -4,13 +4,17 @@ require 'json'
 require 'securerandom'
 require_relative 'environments'
 
-ENROLL_RESPONSE = {
-    "node_key": "this_is_a_node_secret"
-}
-
 FAILED_ENROLL_RESPONSE = {
     "node_invalid": true
 }
+
+NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
+
+def logdebug(message)
+  if ENV['OSQUERYDEBUG']
+    puts "\n" + caller_locations(1,1)[0].label + ": " + message
+  end
+end
 
 class Endpoint < ActiveRecord::Base
   # node_key, string
@@ -19,55 +23,86 @@ class Endpoint < ActiveRecord::Base
   # last_config_time, datetime
   # last_ip, string
   # default ruby timestamps
-end
 
-def config_getter(filename="default")
-  if ENV["RACK_ENV"] == "test"
-    config_folder = "test_files"
-  else
-    config_folder = "osquery_configs"
+  def self.enroll(in_key, params)
+    logdebug "received enroll_secret " + in_key
+
+    if in_key != NODE_ENROLL_SECRET
+      logdebug "invalid enroll_secret. Returning MissingEndpoint"
+      MissingEndpoint.new
+    else
+      logdebug "valid enroll_secret. Creating new endpoint"
+      params.merge! node_key: SecureRandom.uuid, config_count: 0
+      Endpoint.create params
+    end
   end
 
-  file_to_get = File.join(config_folder, "#{filename}.conf")
+  def config(filename="default")
+    if ENV["RACK_ENV"] == "test"
+      logdebug "test environment detected. Serve files from test_files"
+      config_folder = "test_files"
+    else
+      logdebug "serving files from osquery_configs"
+      config_folder = "osquery_configs"
+    end
 
-  if File.exist?(file_to_get)
-    File.read(file_to_get)
-  else
-    File.read(File.join(config_folder, "default.conf"))
+    file_to_get = File.join(config_folder, "#{filename}.conf")
+
+    if File.exist?(file_to_get)
+      File.read(file_to_get)
+    else
+      logdebug "#{file_to_get} does not exist. Falling back to default."
+      File.read(File.join(config_folder, "default.conf"))
+    end
+  end
+
+  def node_secret
+    {"node_key": node_key}.to_json
   end
 end
 
-def valid_node_key?(in_key)
-  puts "valid_node_key?: received key #{in_key}" if ENV['OSQUERYDEBUG']
-  @endpoint = Endpoint.find_by node_key: in_key
+class MissingEndpoint
+  attr_accessor :node_key, :config_count, :last_version,
+    :last_config_time, :last_ip
 
-  if @endpoint.nil?
-    puts "valid_node_key?: #{in_key} is not a valid key" if ENV['OSQUERYDEBUG']
+  def initialize
+    @node_key = "missing endpoint"
+    @last_version = "missing endpoint"
+    @config_count = 0
+    @last_config_time = Time.now
+    @last_ip = "missing endpoint"
+  end
+
+  def valid?
     false
-  else
-    puts "valid_node_key?: #{in_key} is a good key" if ENV['OSQUERYDEBUG']
-    true
   end
-end
 
-def valid_enroll_key?(in_key)
-  enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
-  if in_key == enroll_key
-    puts "valid_enroll_key? - valid key detected" if ENV['OSQUERYDEBUG']
-    true
-  else
-    puts "valid_enroll_key? - key does not match #{ENV['NODE_ENROLL_SECRET']}" if ENV['OSQUERYDEBUG']
+  def config(filename="default")
+    FAILED_ENROLL_RESPONSE.to_json
+  end
+
+  def save
     false
   end
+
+  def node_secret
+    logdebug "sending failed enroll response to client"
+    FAILED_ENROLL_RESPONSE.to_json
+  end
+
 end
 
-def enroll_endpoint(in_agent="none", in_ip="none")
-  node_secret = SecureRandom.uuid
-  @endpoint = Endpoint.new node_key: node_secret, last_version: in_agent, last_ip: in_ip, config_count:0
-  if @endpoint.save
-    {"node_key": node_secret}.to_json
-  else
-    {"error":"error enrolling endpoint"}
+class GuaranteedEndpoint
+  def self.find(id)
+    begin
+      Endpoint.find(id)
+    rescue
+      MissingEndpoint.new
+    end
+  end
+
+  def self.find_by(in_hash)
+    Endpoint.find_by(in_hash) || MissingEndpoint.new
   end
 end
 
@@ -88,13 +123,11 @@ post '/api/enroll' do
   rescue
   end
 
-  puts "POST:api/enroll - received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
+  @endpoint = Endpoint.enroll params['enroll_secret'],
+    last_version: request.user_agent,
+    last_ip: request.ip
+  @endpoint.node_secret
 
-  if valid_enroll_key?(params['enroll_secret'])
-    enroll_endpoint(request.user_agent, request.ip)
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
 end
 
 post '/api/config' do
@@ -104,15 +137,11 @@ post '/api/config' do
     params.merge!(JSON.parse(request.body.read))
   rescue
   end
-  if valid_node_key?(params["node_key"])
-    client = Endpoint.find_by node_key: params['node_key']
-    client.config_count += 1
-    client.last_config_time = Time.now
-    client.save
-    config_getter
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
+  client = GuaranteedEndpoint.find_by node_key: params['node_key']
+  client.config_count += 1
+  client.last_config_time = Time.now
+  client.save
+  client.config
 end
 
 post '/api/config/:name' do
@@ -122,15 +151,11 @@ post '/api/config/:name' do
     params.merge!(JSON.parse(request.body.read))
   rescue
   end
-  if valid_node_key?(params["node_key"])
-    client = Endpoint.find_by node_key: params['node_key']
-    client.config_count += 1
-    client.last_config_time = Time.now
-    client.save
-    config_getter(params['name'])
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
+  client = GuaranteedEndpoint.find_by node_key: params['node_key']
+  client.config_count += 1
+  client.last_config_time = Time.now
+  client.save
+  client.config params['name']
 end
 
 post '/' do
