@@ -63,7 +63,7 @@ end
 
 class MissingEndpoint
   attr_accessor :node_key, :config_count, :last_version,
-    :last_config_time, :last_ip
+    :last_config_time, :last_ip, :created_at, :updated_at
 
   def initialize
     @node_key = "missing endpoint"
@@ -71,6 +71,8 @@ class MissingEndpoint
     @config_count = 0
     @last_config_time = Time.now
     @last_ip = "missing endpoint"
+    @created_at = Time.now
+    @updated_at = Time.now
   end
 
   def valid?
