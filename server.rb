@@ -8,6 +8,8 @@ FAILED_ENROLL_RESPONSE = {
     "node_invalid": true
 }
 
+NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
+
 class Endpoint < ActiveRecord::Base
   # node_key, string
   # last_version, string
@@ -15,6 +17,15 @@ class Endpoint < ActiveRecord::Base
   # last_config_time, datetime
   # last_ip, string
   # default ruby timestamps
+
+  def self.enroll(in_key, params)
+    if in_key != NODE_ENROLL_SECRET
+      MissingEndpoint.new
+    else
+      params.merge! node_key: SecureRandom.uuid, config_count: 0
+      Endpoint.create params
+    end
+  end
 
   def config(filename="default")
     if ENV["RACK_ENV"] == "test"
@@ -31,11 +42,16 @@ class Endpoint < ActiveRecord::Base
       File.read(File.join(config_folder, "default.conf"))
     end
   end
+
+  def node_secret
+    {"node_key": node_key}.to_json
+  end
 end
 
 class MissingEndpoint
   attr_accessor :node_key, :config_count, :last_version,
     :last_config_time, :last_ip
+
   def initialize
     @node_key = "missing endpoint"
     @last_version = "missing endpoint"
@@ -55,6 +71,11 @@ class MissingEndpoint
   def save
     false
   end
+
+  def node_secret
+    FAILED_ENROLL_RESPONSE.to_json
+  end
+
 end
 
 class GuaranteedEndpoint
@@ -68,34 +89,6 @@ class GuaranteedEndpoint
 
   def self.find_by(in_hash)
     Endpoint.find_by(in_hash) || MissingEndpoint.new
-  end
-end
-
-def valid_node_key?(in_key)
-  puts "valid_node_key?: received key #{in_key}" if ENV['OSQUERYDEBUG']
-  @endpoint = GuaranteedEndpoint.find_by node_key: in_key
-  puts "The node is validity is #{@endpoint.valid?}"  if ENV['OSQUERYDEBUG']
-  @endpoint.valid?
-end
-
-def valid_enroll_key?(in_key)
-  enroll_key = ENV['NODE_ENROLL_SECRET'] || "valid_test"
-  if in_key == enroll_key
-    puts "valid_enroll_key? - valid key detected" if ENV['OSQUERYDEBUG']
-    true
-  else
-    puts "valid_enroll_key? - key does not match #{ENV['NODE_ENROLL_SECRET']}" if ENV['OSQUERYDEBUG']
-    false
-  end
-end
-
-def enroll_endpoint(in_agent="none", in_ip="none")
-  node_secret = SecureRandom.uuid
-  @endpoint = Endpoint.new node_key: node_secret, last_version: in_agent, last_ip: in_ip, config_count:0
-  if @endpoint.save
-    {"node_key": node_secret}.to_json
-  else
-    {"error":"error enrolling endpoint"}
   end
 end
 
@@ -118,11 +111,11 @@ post '/api/enroll' do
 
   puts "POST:api/enroll - received enroll_secret #{params['enroll_secret']}" if ENV['OSQUERYDEBUG']
 
-  if valid_enroll_key?(params['enroll_secret'])
-    enroll_endpoint(request.user_agent, request.ip)
-  else
-    FAILED_ENROLL_RESPONSE.to_json
-  end
+  @endpoint = Endpoint.enroll params['enroll_secret'],
+    last_version: request.user_agent,
+    last_ip: request.ip
+  @endpoint.node_secret
+
 end
 
 post '/api/config' do
