@@ -11,4 +11,5 @@
       "description": "A shared secret key for validating osquery endpoints.",
       "generator": "secret"
     }
+  }
 }
