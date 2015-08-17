@@ -21,6 +21,26 @@ class Endpoint < ActiveRecord::Base
   # default ruby timestamps
 end
 
+class MissingEndpoint
+  def valid?
+    false
+  end
+end
+
+class GuaranteedEndpoint
+  def self.find(id)
+    begin
+      Endpoint.find(id)
+    rescue
+      MissingEndpoint.new
+    end
+  end
+
+  def self.find_by(in_hash)
+    Endpoint.find_by(in_hash) || MissingEndpoint.new
+  end
+end
+
 def config_getter(filename="default")
   if ENV["RACK_ENV"] == "test"
     config_folder = "test_files"
@@ -39,15 +59,9 @@ end
 
 def valid_node_key?(in_key)
   puts "valid_node_key?: received key #{in_key}" if ENV['OSQUERYDEBUG']
-  @endpoint = Endpoint.find_by node_key: in_key
-
-  if @endpoint.nil?
-    puts "valid_node_key?: #{in_key} is not a valid key" if ENV['OSQUERYDEBUG']
-    false
-  else
-    puts "valid_node_key?: #{in_key} is a good key" if ENV['OSQUERYDEBUG']
-    true
-  end
+  @endpoint = GuaranteedEndpoint.find_by node_key: in_key
+  puts "The node is validity is #{@endpoint.valid?}"  if ENV['OSQUERYDEBUG']
+  @endpoint.valid?
 end
 
 def valid_enroll_key?(in_key)
