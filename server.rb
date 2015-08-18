@@ -22,17 +22,22 @@ class Endpoint < ActiveRecord::Base
   # config_count, integer
   # last_config_time, datetime
   # last_ip, string
+  # identifier, string
+  # group_label, string
   # default ruby timestamps
 
   def self.enroll(in_key, params)
+    enroll_secret, group_label, identifier = in_key.split(':').reverse
     logdebug "received enroll_secret " + in_key
+    logdebug "extrapolated enroll_secret " + enroll_secret
 
-    if in_key != NODE_ENROLL_SECRET
+    if enroll_secret != NODE_ENROLL_SECRET
       logdebug "invalid enroll_secret. Returning MissingEndpoint"
       MissingEndpoint.new
     else
-      logdebug "valid enroll_secret. Creating new endpoint"
-      params.merge! node_key: SecureRandom.uuid, config_count: 0
+      params.merge! node_key: SecureRandom.uuid, config_count: 0,
+        identifier: identifier, group_label: group_label
+      logdebug "valid enroll_secret. Creating new endpoint - #{params}"
       Endpoint.create params
     end
   end
@@ -63,7 +68,8 @@ end
 
 class MissingEndpoint
   attr_accessor :node_key, :config_count, :last_version,
-    :last_config_time, :last_ip, :created_at, :updated_at
+    :last_config_time, :last_ip, :created_at, :updated_at,
+    :identifier, :group_label
 
   def initialize
     @node_key = "missing endpoint"
@@ -73,6 +79,8 @@ class MissingEndpoint
     @last_ip = "missing endpoint"
     @created_at = Time.now
     @updated_at = Time.now
+    @identifer = "missing endpoint"
+    @group_label = "missing endpoint"
   end
 
   def valid?
