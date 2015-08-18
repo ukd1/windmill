@@ -7,6 +7,10 @@ If you deploy to Heroku using the button above, you'll need to view the
 environment variables to get the random secret that was generated for the NODE_ENROLL_SECRET
 used by the windmill application.
 
+## Compatibility
+
+This has been tested most recently against osquery version 1.5.1-59-g43cf5f1
+
 ## Running the server
 
 For security purposes, the software requires new endpoints to supply a shared
