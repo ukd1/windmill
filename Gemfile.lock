@@ -16,6 +16,7 @@ GEM
       tzinfo (~> 1.1)
     arel (6.0.3)
     builder (3.2.2)
+    database_cleaner (1.4.1)
     diff-lcs (1.2.5)
     i18n (0.7.0)
     json (1.8.1)
@@ -58,6 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  database_cleaner
   json
   pg
   puma
@@ -66,6 +68,3 @@ DEPENDENCIES
   sinatra
   sinatra-activerecord
   sqlite3
-
-BUNDLED WITH
-   1.10.6

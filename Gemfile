@@ -9,8 +9,9 @@ gem 'rack-test'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 
-group :development do
+group :test, :development do
   gem 'sqlite3'
+  gem 'database_cleaner'
 end
 
 group :production do
