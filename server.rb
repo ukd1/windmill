@@ -28,8 +28,8 @@ class Endpoint < ActiveRecord::Base
 
   def self.enroll(in_key, params)
     enroll_secret, group_label, identifier = in_key.split(':').reverse
-    logdebug "received enroll_secret " + in_key
-    logdebug "extrapolated enroll_secret " + enroll_secret
+    logdebug "received enroll_secret " + in_key.to_s
+    logdebug "extrapolated enroll_secret " + enroll_secret.to_s
 
     if enroll_secret != NODE_ENROLL_SECRET
       logdebug "invalid enroll_secret. Returning MissingEndpoint"
