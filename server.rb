@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'json'
 require_relative 'lib/models/endpoint'
+require_relative 'lib/models/configuration'
 
 FAILED_ENROLL_RESPONSE = {
     "node_invalid": true

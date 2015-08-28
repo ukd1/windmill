@@ -11,7 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150817205345) do
+ActiveRecord::Schema.define(version: 20150828181233) do
+
+  create_table "configurations", force: :cascade do |t|
+    t.string  "name",        null: false
+    t.integer "version",     null: false
+    t.text    "config_json", null: false
+    t.text    "notes"
+  end
 
   create_table "endpoints", force: :cascade do |t|
     t.string   "node_key",         null: false
