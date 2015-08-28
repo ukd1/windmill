@@ -11,6 +11,8 @@ class Configuration < ActiveRecord::Base
   validates :name, :version, :config_json, presence: true
   validate :json_validator
 
+  has_many :endpoints
+
   def json_validator
     begin
       JSON.parse!(self.config_json)

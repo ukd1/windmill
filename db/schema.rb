@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150828181233) do
+ActiveRecord::Schema.define(version: 20150828185208) do
 
   create_table "configurations", force: :cascade do |t|
     t.string  "name",        null: false
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20150828181233) do
     t.datetime "last_config_time"
     t.string   "identifier"
     t.string   "group_label"
+    t.integer  "configuration_id"
   end
 
   add_index "endpoints", ["node_key"], name: "index_endpoints_on_node_key"

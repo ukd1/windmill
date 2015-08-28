@@ -7,11 +7,15 @@ class Endpoint < ActiveRecord::Base
   # node_key, string
   # last_version, string
   # config_count, integer
+  # configuration_id, integer
   # last_config_time, datetime
   # last_ip, string
   # identifier, string
   # group_label, string
   # default ruby timestamps
+
+  validates :node_key, :configuration_id, presence: true
+  belongs_to :configuration
 
   def self.enroll(in_key, params)
     enroll_secret, group_label, identifier = in_key.split(':').reverse
@@ -23,7 +27,7 @@ class Endpoint < ActiveRecord::Base
       MissingEndpoint.new
     else
       params.merge! node_key: SecureRandom.uuid, config_count: 0,
-        identifier: identifier, group_label: group_label
+        identifier: identifier, group_label: group_label, configuration_id: 1
       logdebug "valid enroll_secret. Creating new endpoint - #{params}"
       Endpoint.create params
     end

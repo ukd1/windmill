@@ -5,7 +5,8 @@ require_relative '../server.rb'
 
 describe "osquery configuration files" do
   before do
-    @config = Configuration.new(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
+    @config = Configuration.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
+    @endpoint = Endpoint.create(configuration_id: @config.id, node_key: "test")
   end
 
   subject {@config}
@@ -37,6 +38,11 @@ describe "osquery configuration files" do
     expect(@config.valid?).to be_truthy
     @config.config_json = "not valid json"
     expect(@config.valid?).to be_falsey
+  end
+
+  it "should return a list of its endpoints" do
+    @endpoints = @config.endpoints
+    expect(@endpoints.size).to eq(1)
   end
 
 end
