@@ -14,8 +14,9 @@ class Endpoint < ActiveRecord::Base
   # group_label, string
   # default ruby timestamps
 
-  validates :node_key, :configuration_id, presence: true
+  validates :node_key, :configuration_id,  presence: true
   belongs_to :configuration
+  belongs_to :configuration_group
 
   def self.enroll(in_key, params)
     enroll_secret, group_label, identifier = in_key.split(':').reverse

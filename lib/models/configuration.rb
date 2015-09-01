@@ -12,6 +12,7 @@ class Configuration < ActiveRecord::Base
   validate :json_validator
 
   has_many :endpoints
+  belongs_to :configuration_group
 
   def json_validator
     begin

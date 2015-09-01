@@ -15,6 +15,8 @@ describe "osquery configuration files" do
   it { should respond_to :version }
   it { should respond_to :config_json }
   it { should respond_to :notes }
+  it { should respond_to :configuration_group }
+  it { should respond_to :endpoints }
 
   it "should require a name" do
     expect(@config.valid?).to be_truthy
