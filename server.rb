@@ -55,20 +55,6 @@ post '/api/config' do
   client.get_config
 end
 
-post '/api/config/:name' do
-  # This next line is necessary because osqueryd does not send the
-  # enroll_secret as a POST param.
-  begin
-    params.merge!(JSON.parse(request.body.read))
-  rescue
-  end
-  client = GuaranteedEndpoint.find_by node_key: params['node_key']
-  client.config_count += 1
-  client.last_config_time = Time.now
-  client.save
-  client.config params['name']
-end
-
 post '/' do
   {}.to_json
 end

@@ -49,8 +49,3 @@ describe 'Endpoint instance methods' do
   end
 
 end
-
-describe 'Endpoint class methods' do
-  subject {Endpoint}
-  it {should respond_to(:enroll)}
-end

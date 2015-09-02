@@ -18,22 +18,6 @@ class Endpoint < ActiveRecord::Base
   belongs_to :configuration
   belongs_to :configuration_group
 
-  def self.enroll(in_key, params)
-    enroll_secret, group_label, identifier = in_key.split(':').reverse
-    logdebug "received enroll_secret " + in_key.to_s
-    logdebug "extrapolated enroll_secret " + enroll_secret.to_s
-
-    if enroll_secret != NODE_ENROLL_SECRET
-      logdebug "invalid enroll_secret. Returning MissingEndpoint"
-      MissingEndpoint.new
-    else
-      params.merge! node_key: SecureRandom.uuid, config_count: 0,
-        identifier: identifier, group_label: group_label, configuration_id: 1
-      logdebug "valid enroll_secret. Creating new endpoint - #{params}"
-      Endpoint.create params
-    end
-  end
-
   def get_config
     logdebug "returning json from configuration_id #{self.configuration_id}"
     self.configuration.config_json
