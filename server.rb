@@ -33,7 +33,7 @@ post '/api/enroll' do
   rescue
   end
 
-  @endpoint = Endpoint.enroll params['enroll_secret'],
+  @endpoint = GuaranteedConfigurationGroup.enroll params['enroll_secret'],
     last_version: request.user_agent,
     last_ip: request.ip
   @endpoint.node_secret
@@ -48,10 +48,11 @@ post '/api/config' do
   rescue
   end
   client = GuaranteedEndpoint.find_by node_key: params['node_key']
+  logdebug "Received endpoint: #{client.inspect}"
   client.config_count += 1
   client.last_config_time = Time.now
   client.save
-  client.config
+  client.get_config
 end
 
 post '/api/config/:name' do

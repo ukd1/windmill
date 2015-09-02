@@ -34,23 +34,9 @@ class Endpoint < ActiveRecord::Base
     end
   end
 
-  def config(filename="default")
-    if ENV["RACK_ENV"] == "test"
-      logdebug "test environment detected. Serve files from test_files"
-      config_folder = "test_files"
-    else
-      logdebug "serving files from osquery_configs"
-      config_folder = "osquery_configs"
-    end
-
-    file_to_get = File.join(config_folder, "#{filename}.conf")
-
-    if File.exist?(file_to_get)
-      File.read(file_to_get)
-    else
-      logdebug "#{file_to_get} does not exist. Falling back to default."
-      File.read(File.join(config_folder, "default.conf"))
-    end
+  def get_config
+    logdebug "returning json from configuration_id #{self.configuration_id}"
+    self.configuration.config_json
   end
 
   def node_secret
@@ -68,6 +54,7 @@ class GuaranteedEndpoint
   end
 
   def self.find_by(in_hash)
+    logdebug "searching for endpoint with these values: #{in_hash.inspect}"
     Endpoint.find_by(in_hash) || MissingEndpoint.new
   end
 end
@@ -93,7 +80,7 @@ class MissingEndpoint
     false
   end
 
-  def config(filename="default")
+  def get_config(filename="default")
     FAILED_ENROLL_RESPONSE.to_json
   end
 

@@ -5,9 +5,9 @@ require_relative '../server.rb'
 
 describe 'Endpoint instance methods' do
   before do
-    @cg = ConfigurationGroup.create(name: "test")
-    @config = Configuration.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json, configuration_group_id: @cg.id)
-    @endpoint = Endpoint.create(node_key:"test", configuration_id: @config.id, configuration_group_id: @cg.id)
+    @cg = ConfigurationGroup.create(name: "default")
+    @config = @cg.configurations.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
+    @endpoint = @cg.endpoints.create(node_key:"test", configuration_id: @cg.default_config)
   end
 
   subject { @endpoint }
@@ -18,15 +18,18 @@ describe 'Endpoint instance methods' do
   it {should respond_to(:created_at)}
   it {should respond_to(:updated_at)}
   it {should respond_to(:last_config_time)}
-  it {should respond_to(:config)}
   it {should respond_to(:node_secret)}
   it {should respond_to(:identifier)}
   it {should respond_to(:group_label)}
   it {should respond_to(:configuration)}
   it {should respond_to(:configuration_group)}
 
-  it "should return a configuration" do
+  it "should return a configuration object" do
     expect(@endpoint.configuration.id).to eq(@config.id)
+  end
+
+  it "should return configuration text" do
+    expect(@endpoint.get_config).to eq({test:"test"}.to_json)
   end
 
   it "should return a configuration group" do

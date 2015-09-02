@@ -5,12 +5,12 @@ require 'database_cleaner'
 
 RSpec.configure do |config|
 
-  config.before(:suite) do
+  config.before(:each) do
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.start
   end
 
-  config.after(:suite) do
+  config.after(:each) do
     DatabaseCleaner.clean
   end
 
