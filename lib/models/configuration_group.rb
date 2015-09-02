@@ -9,4 +9,15 @@ class ConfigurationGroup < ActiveRecord::Base
   has_many :configurations
   has_many :endpoints
 
+  def default_config
+    1
+  end
+
+end
+
+
+class GuaranteedConfigurationGroup
+  def self.find_by(in_hash)
+    ConfigurationGroup.find_by(in_hash) || ConfigurationGroup.find_by( name: "default")
+  end
 end
