@@ -21,7 +21,7 @@ need to be run once
 
 ```
 bundle install
-rake db:migrate
+rake db:setup
 ruby server.rb
 ```
 
