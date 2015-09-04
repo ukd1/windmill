@@ -61,3 +61,15 @@ namespace '/api' do
   end
 
 end
+
+namespace '/configuration-groups' do
+  get  do
+    @groups = ConfigurationGroup.all
+    erb :"configuration_groups/index"
+  end
+
+  post do
+    @cg = ConfigurationGroup.create(name: params['name'])
+    redirect '/configuration-groups'
+  end
+end
