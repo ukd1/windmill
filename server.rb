@@ -21,8 +21,8 @@ get '/status' do
   "running at #{Time.now}"
 end
 
-post '/' do
-  {}.to_json
+get '/' do
+  redirect '/configuration-groups'
 end
 
 namespace '/api' do
@@ -69,7 +69,34 @@ namespace '/configuration-groups' do
   end
 
   post do
-    @cg = ConfigurationGroup.create(name: params['name'])
+    @cg = ConfigurationGroup.create(name: params[:name])
     redirect '/configuration-groups'
+  end
+
+  namespace '/:cg_id' do
+    get do
+      @cg = ConfigurationGroup.find(params[:cg_id])
+      erb :"configuration_groups/show"
+    end
+
+    post do
+      @cg = ConfigurationGroup.find(params[:cg_id])
+      puts "we're good"
+      @config = @cg.configurations.build(params[:config])
+      puts @config.inspect
+      if @config.save
+        redirect "/configuration-groups/#{@cg.id}"
+      else
+        @config.errors.messages.to_s
+      end
+    end
+
+    namespace '/configurations/new' do
+      get do
+        @cg = ConfigurationGroup.find(params[:cg_id])
+        @config = @cg.configurations.build
+        erb :"configurations/new"
+      end
+    end
   end
 end

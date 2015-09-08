@@ -7,7 +7,7 @@
   </thead>
   <tbody>
     <% @groups.each do |cg| %>
-      <tr><td><%= cg.name %></td><td><%= cg.endpoints.count %></td></tr>
+      <tr><td><a href="<%= "/configuration-groups/#{cg.id}" %>"><%= cg.name %></a></td><td><%= cg.endpoints.count %></td></tr>
     <% end %>
   </tbody>
 </table>
