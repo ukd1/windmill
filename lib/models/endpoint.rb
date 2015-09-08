@@ -65,7 +65,7 @@ class MissingEndpoint
   end
 
   def get_config(filename="default")
-    FAILED_ENROLL_RESPONSE.to_json
+    {"node_invalid": true}.to_json
   end
 
   def save
@@ -74,6 +74,6 @@ class MissingEndpoint
 
   def node_secret
     logdebug "sending failed enroll response to client"
-    FAILED_ENROLL_RESPONSE.to_json
+    {"node_invalid": true}.to_json
   end
 end

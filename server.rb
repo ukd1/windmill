@@ -6,10 +6,6 @@ require_relative 'lib/models/configuration'
 require_relative 'lib/models/configuration_group'
 require_relative 'lib/models/enroller'
 
-FAILED_ENROLL_RESPONSE = {
-    "node_invalid": true
-}
-
 NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
 
 def logdebug(message)
