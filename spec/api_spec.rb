@@ -12,6 +12,7 @@ describe 'The osquery TLS api' do
 
   before do
     @cg = ConfigurationGroup.create(name: "default")
+    @empty = ConfigurationGroup.create(name: "empty")
     @config = @cg.configurations.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
     @endpoint = @cg.endpoints.create(node_key:SecureRandom.uuid, configuration_id: @cg.default_config, config_count: 0)
   end
@@ -106,6 +107,17 @@ describe 'The osquery TLS api' do
     valid_node_key = json["node_key"]
     @endpoint = GuaranteedEndpoint.find_by node_key: valid_node_key
     expect(@endpoint.identifier).to eq("hostname")
+    expect(@endpoint.configuration_group_id).to eq(GuaranteedConfigurationGroup.find_by(name: "default").id)
+  end
+
+  it "enrolls an endpoint into the default ConfigurationGroup when a valid group name is supplied but the group has no configurations" do
+    post '/api/enroll', {enroll_secret: "empty-test:empty:valid_test"}
+    expect(last_response).to be_ok
+    json = JSON.parse(last_response.body)
+    expect(json).to have_key("node_key")
+    valid_node_key = json["node_key"]
+    @endpoint = GuaranteedEndpoint.find_by node_key: valid_node_key
+    expect(@endpoint.identifier).to eq("empty-test")
     expect(@endpoint.configuration_group_id).to eq(GuaranteedConfigurationGroup.find_by(name: "default").id)
   end
 

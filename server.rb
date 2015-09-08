@@ -4,6 +4,7 @@ require 'json'
 require_relative 'lib/models/endpoint'
 require_relative 'lib/models/configuration'
 require_relative 'lib/models/configuration_group'
+require_relative 'lib/models/enroller'
 
 FAILED_ENROLL_RESPONSE = {
     "node_invalid": true
@@ -39,7 +40,7 @@ namespace '/api' do
     rescue
     end
 
-    @endpoint = GuaranteedConfigurationGroup.enroll params['enroll_secret'],
+    @endpoint = Enroller.enroll params['enroll_secret'],
       last_version: request.user_agent,
       last_ip: request.ip
     @endpoint.node_secret
