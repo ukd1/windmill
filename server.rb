@@ -1,5 +1,5 @@
 require 'sinatra'
-require 'sinatra/contrib'
+require 'sinatra/namespace'
 require 'json'
 require_relative 'lib/models/endpoint'
 require_relative 'lib/models/configuration'
