@@ -24,8 +24,12 @@ describe 'Endpoint instance methods' do
   it {should respond_to(:configuration)}
   it {should respond_to(:configuration_group)}
 
-  it "should return a configuration object" do
-    expect(@endpoint.configuration.id).to eq(@config.id)
+  it "should know the configuration object to which it is assigned" do
+    expect(@endpoint.assigned_config.id).to eq(@config.id)
+  end
+
+  it "should know the last configuration object which it received" do
+    expect(@endpoint.last_config.id).to eq(@config.id)
   end
 
   it "should return configuration text" do
