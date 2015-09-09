@@ -11,7 +11,8 @@ class Configuration < ActiveRecord::Base
   validates :name, :version, :config_json, presence: true
   validate :json_validator
 
-  has_many :endpoints
+  has_many :assigned_endpoints, class_name: 'Endpoint', foreign_key: 'assigned_config_id'
+  has_many :configured_endpoints, class_name: 'Endpoint', foreign_key: 'last_config_id'
   belongs_to :configuration_group
 
   def json_validator

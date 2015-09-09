@@ -15,7 +15,8 @@ class Endpoint < ActiveRecord::Base
   # default ruby timestamps
 
   validates :node_key, :configuration_id,  presence: true
-  belongs_to :configuration
+  belongs_to :assigned_config, class_name: 'Configuration'
+  belongs_to :last_config, class_name: 'Configuration'
   belongs_to :configuration_group
 
   def get_config
