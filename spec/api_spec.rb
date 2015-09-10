@@ -14,7 +14,7 @@ describe 'The osquery TLS api' do
     @cg = ConfigurationGroup.create(name: "default")
     @empty = ConfigurationGroup.create(name: "empty")
     @config = @cg.configurations.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
-    @endpoint = @cg.endpoints.create(node_key:SecureRandom.uuid, assigned_config_id: @cg.default_config)
+    @endpoint = @cg.endpoints.create(node_key:SecureRandom.uuid)
   end
 
   valid_node_key = ""

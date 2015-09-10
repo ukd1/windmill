@@ -8,7 +8,7 @@ describe "osquery configuration groups" do
     @cg = ConfigurationGroup.create(name: "test")
     @cg2 = ConfigurationGroup.new(name: "test2")
     @config = @cg.configurations.create(name: "test_config", version: 1, config_json: {test: "test"}.to_json)
-    @endpoint = @cg.endpoints.create(node_key:"test", assigned_config_id: @config.id)
+    @endpoint = @cg.endpoints.create(node_key:"test")
   end
 
   subject {@cg}
