@@ -18,7 +18,7 @@ class Enroller
         logdebug "ConfigurationGroup has no configurations. Returning default"
         @cg = GuaranteedConfigurationGroup.find_by name: "default"
       end
-      params.merge!(configuration_id: @cg.default_config,
+      params.merge!(assigned_config_id: @cg.default_config,
         node_key: SecureRandom.uuid,
         config_count: 0,
         identifier: identifier)

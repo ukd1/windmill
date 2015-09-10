@@ -6,7 +6,7 @@ require_relative '../server.rb'
 describe "osquery configuration files" do
   before do
     @config = Configuration.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
-    @endpoint = Endpoint.create(configuration_id: @config.id, node_key: "test")
+    @endpoint = @config.assigned_endpoints.create(node_key:"test")
   end
 
   subject {@config}
@@ -16,7 +16,8 @@ describe "osquery configuration files" do
   it { should respond_to :config_json }
   it { should respond_to :notes }
   it { should respond_to :configuration_group }
-  it { should respond_to :endpoints }
+  it { should respond_to :assigned_endpoints }
+  it { should respond_to :configured_endpoints }
 
   it "should require a name" do
     expect(@config.valid?).to be_truthy
@@ -42,8 +43,8 @@ describe "osquery configuration files" do
     expect(@config.valid?).to be_falsey
   end
 
-  it "should return a list of its endpoints" do
-    @endpoints = @config.endpoints
+  it "should return a list of its assigned endpoints" do
+    @endpoints = @config.assigned_endpoints
     expect(@endpoints.size).to eq(1)
   end
 

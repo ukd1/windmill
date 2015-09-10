@@ -14,18 +14,34 @@ class Endpoint < ActiveRecord::Base
   # group_label, string
   # default ruby timestamps
 
-  validates :node_key, :configuration_id,  presence: true
-  belongs_to :assigned_config, class_name: 'Configuration'
-  belongs_to :last_config, class_name: 'Configuration'
+  validates :node_key, :assigned_config_id,  presence: true
+  belongs_to :assigned_config, class_name: 'Configuration', foreign_key: 'assigned_config_id'
+  belongs_to :last_config, class_name: 'Configuration', foreign_key: 'last_config_id'
   belongs_to :configuration_group
 
   def get_config
-    logdebug "returning json from configuration_id #{self.configuration_id}"
-    self.configuration.config_json
+    logdebug "returning json from configuration_id #{self.assigned_config.id}"
+    self.assigned_config.config_json
   end
 
   def node_secret
     {"node_key": node_key}.to_json
+  end
+
+  def assigned_config
+    begin
+      Configuration.find(assigned_config_id)
+    rescue
+      Configuration.new
+    end
+  end
+
+  def last_config
+    begin
+      Configuration.find(last_config_id)
+    rescue
+      Configuration.new
+    end
   end
 end
 

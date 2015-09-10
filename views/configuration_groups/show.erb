@@ -6,6 +6,7 @@
     <tr>
       <th>Name</th>
       <th>Version</th>
+      <th>Assignment Count</th>
       <th>Endpoint Count</th>
     </tr>
   </thead>
@@ -14,7 +15,8 @@
       <tr>
         <td><%= config.name %></td>
         <td><%= config.version %></td>
-        <td><%= config.endpoints.count %></td>
+        <td><%= config.assigned_endpoints.count %></td>
+        <td><%= config.configured_endpoints.count %></td>
       </tr>
     <% end %>
   </tbody>

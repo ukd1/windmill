@@ -5,7 +5,7 @@ require_relative '../server.rb'
 
 describe 'GuaranteedEndpoint class methods' do
   before do
-    Endpoint.create(node_key: "testingkey", configuration_id: 1)
+    Endpoint.create(node_key: "testingkey", assigned_config_id: 1)
   end
   subject {GuaranteedEndpoint}
 
