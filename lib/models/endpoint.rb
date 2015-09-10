@@ -18,10 +18,20 @@ class Endpoint < ActiveRecord::Base
   belongs_to :assigned_config, class_name: 'Configuration', foreign_key: 'assigned_config_id'
   belongs_to :last_config, class_name: 'Configuration', foreign_key: 'last_config_id'
   belongs_to :configuration_group
+  after_initialize :post_init
+
+
+  def post_init
+    self.config_count = self.config_count || 0
+    self.assigned_config_id = self.assigned_config_id || self.configuration_group.default_config
+  end
 
   def get_config
     logdebug "returning json from configuration_id #{self.assigned_config.id}"
-    self.assigned_config.config_json
+      self.config_count += 1
+      self.last_config_time = Time.now
+      self.save
+      self.assigned_config.config_json
   end
 
   def node_secret

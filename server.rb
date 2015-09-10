@@ -51,9 +51,6 @@ namespace '/api' do
     end
     client = GuaranteedEndpoint.find_by node_key: params['node_key']
     logdebug "Received endpoint: #{client.inspect}"
-    client.config_count += 1
-    client.last_config_time = Time.now
-    client.save
     client.get_config
   end
 

@@ -14,7 +14,7 @@ describe 'The osquery TLS api' do
     @cg = ConfigurationGroup.create(name: "default")
     @empty = ConfigurationGroup.create(name: "empty")
     @config = @cg.configurations.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
-    @endpoint = @cg.endpoints.create(node_key:SecureRandom.uuid, assigned_config_id: @cg.default_config, config_count: 0)
+    @endpoint = @cg.endpoints.create(node_key:SecureRandom.uuid, assigned_config_id: @cg.default_config)
   end
 
   valid_node_key = ""
@@ -44,11 +44,11 @@ describe 'The osquery TLS api' do
   end
 
   it "updates the timestamp in last_config_time when a client pulls its config" do
-    client = Endpoint.last
-    config_time = client.last_config_time || Time.now
-    post '/api/config', node_key: client.node_key
-    client.reload
-    expect(client.last_config_time).to be > config_time
+    @client = Endpoint.last
+    config_time = @client.last_config_time || Time.now
+    post '/api/config', node_key: @client.node_key
+    @client.reload
+    expect(@client.last_config_time).to be > config_time
   end
 
   it "returns a status" do
