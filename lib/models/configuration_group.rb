@@ -17,6 +17,10 @@ end
 
 
 class GuaranteedConfigurationGroup
+  def self.find(id)
+    ConfigurationGroup.find_by({id: id}) || ConfigurationGroup.find_by(name: "default")
+  end
+  
   def self.find_by(in_hash)
     logdebug "searching for a ConfigurationGroup #{in_hash.inspect}"
     ConfigurationGroup.find_by(in_hash) || ConfigurationGroup.find_by(name: "default")

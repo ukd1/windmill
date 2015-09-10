@@ -69,12 +69,12 @@ namespace '/configuration-groups' do
 
   namespace '/:cg_id' do
     get do
-      @cg = ConfigurationGroup.find(params[:cg_id])
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       erb :"configuration_groups/show"
     end
 
     post do
-      @cg = ConfigurationGroup.find(params[:cg_id])
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       puts "we're good"
       @config = @cg.configurations.build(params[:config])
       puts @config.inspect
@@ -87,7 +87,7 @@ namespace '/configuration-groups' do
 
     namespace '/configurations/new' do
       get do
-        @cg = ConfigurationGroup.find(params[:cg_id])
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
         @config = @cg.configurations.build
         erb :"configurations/new"
       end

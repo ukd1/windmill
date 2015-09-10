@@ -40,7 +40,7 @@ class Endpoint < ActiveRecord::Base
 
   def assigned_config
     begin
-      Configuration.find(assigned_config_id)
+      GuaranteedConfiguration.find(assigned_config_id)
     rescue
       Configuration.new
     end
@@ -48,7 +48,7 @@ class Endpoint < ActiveRecord::Base
 
   def last_config
     begin
-      Configuration.find(last_config_id)
+      GuaranteedConfiguration.find(last_config_id)
     rescue
       Configuration.new
     end
@@ -57,11 +57,7 @@ end
 
 class GuaranteedEndpoint
   def self.find(id)
-    begin
-      Endpoint.find(id)
-    rescue
-      MissingEndpoint.new
-    end
+    Endpoint.find_by({id:id}) || MissingEndpoint.new
   end
 
   def self.find_by(in_hash)

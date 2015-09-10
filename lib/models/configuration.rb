@@ -24,3 +24,29 @@ class Configuration < ActiveRecord::Base
     true
   end
 end
+
+class MissingConfiguration
+  attr_accessor :assigned_endpoints,
+    :configured_endpoints,
+    :configuration_group
+
+  def initialize
+    assigned_endpoints = []
+    configured_endpoints = []
+  end
+
+  def configuration_group
+    puts "fixme"
+  end
+
+end
+
+class GuaranteedConfiguration
+  def self.find(id)
+    Configuration.find_by({id: id}) || MissingConfiguration.new
+  end
+
+  def self.find_by(hash)
+    Configuration.find_by(hash) || MissingConfiguration.new
+  end
+end
