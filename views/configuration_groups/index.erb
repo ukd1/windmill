@@ -1,0 +1,19 @@
+<table border=1>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Endpoint Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @groups.each do |cg| %>
+      <tr><td><a href="<%= "/configuration-groups/#{cg.id}" %>"><%= cg.name %></a></td><td><%= cg.endpoints.count %></td></tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h2>Add a new Configuration Group</h2>
+<form action="/configuration-groups" method="post">
+  Name: <input type="text", name="name">
+  <button type="submit">Add</button>
+</form>

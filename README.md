@@ -1,7 +1,7 @@
 # osquery-tls-server
 
 A TLS endpoint for delivering osquery configuration files to nodes. The quickest
-way to get started is to [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+way to get started is to [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/blackfist/windmill/tree/config_model)
 
 If you deploy to Heroku using the button above, you'll need to view the
 environment variables to get the random secret that was generated for the NODE_ENROLL_SECRET
@@ -21,7 +21,7 @@ need to be run once
 
 ```
 bundle install
-rake db:migrate
+rake db:setup
 ruby server.rb
 ```
 

@@ -1,0 +1,11 @@
+<h1>Configuration group: <%= @cg.name %></h1>
+<h2>Create new configuration</h2>
+<form action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
+  Name: <input type="text" name="config[name]"><br>
+  Version: <input type="number" name="config[version]"><br>
+  Notes:<br>
+  <textarea name="config[notes]" rows=5></textarea><br>
+  Configuration JSON:<br>
+  <textarea name="config[config_json]" rows=20></textarea><br>
+  <button type="submit">Add</button>
+</form>

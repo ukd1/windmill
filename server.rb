@@ -1,12 +1,10 @@
 require 'sinatra'
-require 'sinatra/activerecord'
+require 'sinatra/namespace'
 require 'json'
-require 'securerandom'
-require_relative 'environments'
-
-FAILED_ENROLL_RESPONSE = {
-    "node_invalid": true
-}
+require_relative 'lib/models/endpoint'
+require_relative 'lib/models/configuration'
+require_relative 'lib/models/configuration_group'
+require_relative 'lib/models/enroller'
 
 NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
 
@@ -16,158 +14,83 @@ def logdebug(message)
   end
 end
 
-class Endpoint < ActiveRecord::Base
-  # node_key, string
-  # last_version, string
-  # config_count, integer
-  # last_config_time, datetime
-  # last_ip, string
-  # identifier, string
-  # group_label, string
-  # default ruby timestamps
-
-  def self.enroll(in_key, params)
-    enroll_secret, group_label, identifier = in_key.split(':').reverse
-    logdebug "received enroll_secret " + in_key.to_s
-    logdebug "extrapolated enroll_secret " + enroll_secret.to_s
-
-    if enroll_secret != NODE_ENROLL_SECRET
-      logdebug "invalid enroll_secret. Returning MissingEndpoint"
-      MissingEndpoint.new
-    else
-      params.merge! node_key: SecureRandom.uuid, config_count: 0,
-        identifier: identifier, group_label: group_label
-      logdebug "valid enroll_secret. Creating new endpoint - #{params}"
-      Endpoint.create params
-    end
-  end
-
-  def config(filename="default")
-    if ENV["RACK_ENV"] == "test"
-      logdebug "test environment detected. Serve files from test_files"
-      config_folder = "test_files"
-    else
-      logdebug "serving files from osquery_configs"
-      config_folder = "osquery_configs"
-    end
-
-    file_to_get = File.join(config_folder, "#{filename}.conf")
-
-    if File.exist?(file_to_get)
-      File.read(file_to_get)
-    else
-      logdebug "#{file_to_get} does not exist. Falling back to default."
-      File.read(File.join(config_folder, "default.conf"))
-    end
-  end
-
-  def node_secret
-    {"node_key": node_key}.to_json
-  end
-end
-
-class MissingEndpoint
-  attr_accessor :node_key, :config_count, :last_version,
-    :last_config_time, :last_ip, :created_at, :updated_at,
-    :identifier, :group_label
-
-  def initialize
-    @node_key = "missing endpoint"
-    @last_version = "missing endpoint"
-    @config_count = 0
-    @last_config_time = Time.now
-    @last_ip = "missing endpoint"
-    @created_at = Time.now
-    @updated_at = Time.now
-    @identifer = "missing endpoint"
-    @group_label = "missing endpoint"
-  end
-
-  def valid?
-    false
-  end
-
-  def config(filename="default")
-    FAILED_ENROLL_RESPONSE.to_json
-  end
-
-  def save
-    false
-  end
-
-  def node_secret
-    logdebug "sending failed enroll response to client"
-    FAILED_ENROLL_RESPONSE.to_json
-  end
-
-end
-
-class GuaranteedEndpoint
-  def self.find(id)
-    begin
-      Endpoint.find(id)
-    rescue
-      MissingEndpoint.new
-    end
-  end
-
-  def self.find_by(in_hash)
-    Endpoint.find_by(in_hash) || MissingEndpoint.new
-  end
-end
-
 get '/status' do
   "running at #{Time.now}"
 end
 
-get '/api/status' do
-  {"status": "running", "timestamp": Time.now}.to_json
+get '/' do
+  redirect '/configuration-groups'
 end
 
-post '/api/enroll' do
-  # This next line is necessary because osqueryd does not send the
-  # enroll_secret as a POST param.
-  begin
-    json_data = JSON.parse(request.body.read)
-    params.merge!(json_data)
-  rescue
+namespace '/api' do
+  get '/status' do
+    {"status": "running", "timestamp": Time.now}.to_json
   end
 
-  @endpoint = Endpoint.enroll params['enroll_secret'],
-    last_version: request.user_agent,
-    last_ip: request.ip
-  @endpoint.node_secret
+  post '/enroll' do
+    # This next line is necessary because osqueryd does not send the
+    # enroll_secret as a POST param.
+    begin
+      json_data = JSON.parse(request.body.read)
+      params.merge!(json_data)
+    rescue
+    end
 
-end
-
-post '/api/config' do
-  # This next line is necessary because osqueryd does not send the
-  # enroll_secret as a POST param.
-  begin
-    params.merge!(JSON.parse(request.body.read))
-  rescue
+    @endpoint = Enroller.enroll params['enroll_secret'],
+      last_version: request.user_agent,
+      last_ip: request.ip
+    @endpoint.node_secret
   end
-  client = GuaranteedEndpoint.find_by node_key: params['node_key']
-  client.config_count += 1
-  client.last_config_time = Time.now
-  client.save
-  client.config
-end
 
-post '/api/config/:name' do
-  # This next line is necessary because osqueryd does not send the
-  # enroll_secret as a POST param.
-  begin
-    params.merge!(JSON.parse(request.body.read))
-  rescue
+  post '/config' do
+    # This next line is necessary because osqueryd does not send the
+    # enroll_secret as a POST param.
+    begin
+      params.merge!(JSON.parse(request.body.read))
+    rescue
+    end
+    client = GuaranteedEndpoint.find_by node_key: params['node_key']
+    logdebug "Received endpoint: #{client.inspect}"
+    client.get_config
   end
-  client = GuaranteedEndpoint.find_by node_key: params['node_key']
-  client.config_count += 1
-  client.last_config_time = Time.now
-  client.save
-  client.config params['name']
+
 end
 
-post '/' do
-  {}.to_json
+namespace '/configuration-groups' do
+  get  do
+    @groups = ConfigurationGroup.all
+    erb :"configuration_groups/index"
+  end
+
+  post do
+    @cg = ConfigurationGroup.create(name: params[:name])
+    redirect '/configuration-groups'
+  end
+
+  namespace '/:cg_id' do
+    get do
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+      erb :"configuration_groups/show"
+    end
+
+    post do
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+      puts "we're good"
+      @config = @cg.configurations.build(params[:config])
+      puts @config.inspect
+      if @config.save
+        redirect "/configuration-groups/#{@cg.id}"
+      else
+        @config.errors.messages.to_s
+      end
+    end
+
+    namespace '/configurations/new' do
+      get do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+        @config = @cg.configurations.build
+        erb :"configurations/new"
+      end
+    end
+  end
 end

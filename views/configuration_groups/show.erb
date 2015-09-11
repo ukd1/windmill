@@ -1,0 +1,48 @@
+<h1>Configuration group: <%= @cg.name %></h1>
+
+<h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
+<table border=1>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Version</th>
+      <th>Assignment Count</th>
+      <th>Endpoint Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @cg.configurations.each do |config| %>
+      <tr>
+        <td><%= config.name %></td>
+        <td><%= config.version %></td>
+        <td><%= config.assigned_endpoints.count %></td>
+        <td><%= config.configured_endpoints.count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
+
+<h2>Endpoints in this group (<%= @cg.endpoints.count %>)
+<table border=1>
+  <thead>
+    <tr>
+      <th>Identifier</th>
+      <th>Osquery version</th>
+      <th>Config refresh count</th>
+      <th>Last ip address</th>
+      <th>Last config refresh</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @cg.endpoints.each do |endpoint| %>
+      <tr>
+        <td><%= endpoint.identifier %></td>
+        <td><%= endpoint.last_version %></td>
+        <td><%= endpoint.config_count %></td>
+        <td><%= endpoint.last_ip %></td>
+        <td><%= endpoint.last_config_time %></td>
+    <% end %>
+  </tbody>
+</table>
