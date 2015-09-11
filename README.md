@@ -119,10 +119,7 @@ provide that back to the endpoint.
 ## Running tests
 
 The tests are written in RSpec and make use of the `rack-test` gem. If you do a
-`bundle install` you should have that. Since the application uses a database to
-keep track of node_keys, you'll need to prepare the database before the first
-time you run the tests. `RACK_ENV=test rake db:migrate`. It shouldn't be that way
-and there is a bug waiting to be fixed: https://github.com/blackfist/windmill/issues/8
+`bundle install` you should have that.
 
-So you can just run `rspec spec` to run
+Then you can just run `rspec spec/` to run
 the tests.
