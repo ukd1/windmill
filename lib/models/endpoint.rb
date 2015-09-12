@@ -23,7 +23,9 @@ class Endpoint < ActiveRecord::Base
 
   def post_init
     self.config_count = self.config_count || 0
-    self.assigned_config_id = self.assigned_config_id || self.configuration_group.default_config
+    if self.assigned_config_id.nil?
+      self.assigned_config = self.configuration_group.default_config
+    end
   end
 
   def get_config
