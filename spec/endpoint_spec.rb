@@ -7,7 +7,8 @@ describe 'Endpoint instance methods' do
   before do
     @cg = ConfigurationGroup.create(name: "default")
     @config = @cg.configurations.create(name:"test", version:1, notes:"test", config_json: {test:"test"}.to_json)
-    @endpoint = @cg.endpoints.create(node_key:"test", last_config_id: @cg.default_config)
+    @endpoint = @cg.endpoints.create(node_key:"test")
+    @endpoint.get_config
   end
 
   subject { @endpoint }

@@ -28,11 +28,13 @@ end
 class MissingConfiguration
   attr_accessor :assigned_endpoints,
     :configured_endpoints,
-    :configuration_group
+    :configuration_group,
+    :id
 
   def initialize
-    assigned_endpoints = []
-    configured_endpoints = []
+    @assigned_endpoints = []
+    @configured_endpoints = []
+    @id = 0
   end
 
   def configuration_group

@@ -30,6 +30,7 @@ class Endpoint < ActiveRecord::Base
     logdebug "returning json from configuration_id #{self.assigned_config.id}"
       self.config_count += 1
       self.last_config_time = Time.now
+      self.last_config = self.assigned_config
       self.save
       self.assigned_config.config_json
   end
