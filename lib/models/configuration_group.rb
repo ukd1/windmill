@@ -20,6 +20,38 @@ class ConfigurationGroup < ActiveRecord::Base
     self.default_config_id = in_config.id
   end
 
+  def assign_config_percent(config, in_percent)
+    begin
+      if in_percent.to_i > 100
+        return false
+      end
+      if in_percent.to_i <= 0
+        return false
+      end
+    rescue
+      return false
+    end
+    if !self.configurations.include?(config)
+      return false
+    end
+
+    # Here are the endpoints that already have the config being assigned
+    already_done = self.endpoints.where(assigned_config: config)
+
+    # Shuffle the rest of the endpoints
+    remaining = self.endpoints.except(assigned_config: config).shuffle
+
+    # merge the two collections
+    all_endpoints = already_done + remaining
+
+    # now get the front of the whole list and assign configurations
+    all_endpoints[0..(all_endpoints.count * (in_percent/100.0)).to_i].each do |e|
+      e.assigned_config = config
+      e.save
+    end
+    true
+  end
+
 end
 
 

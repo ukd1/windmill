@@ -38,6 +38,7 @@
       <th>Config refresh count</th>
       <th>Last ip address</th>
       <th>Last config refresh</th>
+      <th>Assigned configuration</th>
     </tr>
   </thead>
   <tbody>
@@ -48,6 +49,7 @@
         <td><%= endpoint.config_count %></td>
         <td><%= endpoint.last_ip %></td>
         <td><%= endpoint.last_config_time %></td>
+        <td><%= endpoint.assigned_config.name %></td>
     <% end %>
   </tbody>
 </table>
