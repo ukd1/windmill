@@ -1,6 +1,6 @@
 <h1>Configuration group: <%= @cg.name %></h1>
 <h2>Create new configuration</h2>
-<form action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
+<form action="<%= "/configuration-groups/#{@cg.id}/configurations" %>" method="post">
   Name: <input type="text" name="config[name]"><br>
   Version: <input type="number" name="config[version]"><br>
   Notes:<br>

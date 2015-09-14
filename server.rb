@@ -75,21 +75,28 @@ namespace '/configuration-groups' do
 
     post do
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
-      puts "we're good"
-      @config = @cg.configurations.build(params[:config])
-      puts @config.inspect
-      if @config.save
-        redirect "/configuration-groups/#{@cg.id}"
-      else
-        @config.errors.messages.to_s
-      end
+      @cg.default_config = GuaranteedConfiguration.find(params[:default_config])
+      @cg.save
+      redirect "/configuration-groups/#{params[:cg_id]}"
     end
 
-    namespace '/configurations/new' do
-      get do
+    namespace '/configurations' do
+      get '/new' do
         @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
         @config = @cg.configurations.build
         erb :"configurations/new"
+      end
+
+      post do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+        puts "we're good"
+        @config = @cg.configurations.build(params[:config])
+        puts @config.inspect
+        if @config.save
+          redirect "/configuration-groups/#{@cg.id}"
+        else
+          @config.errors.messages.to_s
+        end
       end
     end
   end

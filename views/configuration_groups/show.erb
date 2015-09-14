@@ -1,5 +1,6 @@
 <h1>Configuration group: <%= @cg.name %></h1>
 
+<form action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
 <h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
 <table border=1>
   <thead>
@@ -8,6 +9,7 @@
       <th>Version</th>
       <th>Assignment Count</th>
       <th>Endpoint Count</th>
+      <th>Default Config</th>
     </tr>
   </thead>
   <tbody>
@@ -17,10 +19,13 @@
         <td><%= config.version %></td>
         <td><%= config.assigned_endpoints.count %></td>
         <td><%= config.configured_endpoints.count %></td>
+        <td><input type="radio" name="default_config" value="<%= config.id %>" <%if @cg.default_config == config %>checked="checked"<% end %>/></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+<button type="submit">Save</button>
+</form>
 
 <a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
 
