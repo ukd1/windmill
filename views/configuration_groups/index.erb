@@ -1,19 +1,72 @@
-<table border=1>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Endpoint Count</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @groups.each do |cg| %>
-      <tr><td><a href="<%= "/configuration-groups/#{cg.id}" %>"><%= cg.name %></a></td><td><%= cg.endpoints.count %></td></tr>
-    <% end %>
-  </tbody>
-</table>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Windmill</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<h2>Add a new Configuration Group</h2>
-<form action="/configuration-groups" method="post">
-  Name: <input type="text", name="name">
-  <button type="submit">Add</button>
-</form>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-responsive.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  </head>
+  <body>
+
+    <div class="container">
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Windmill</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">New</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+    </div>
+
+    <div class="container">
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Endpoint Groups</div>
+
+        <!-- Table -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Group Name</th>
+              <th>Endpoint Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @groups.each do |cg| %>
+              <tr><td><a href="<%= "/configuration-groups/#{cg.id}" %>"><%= cg.name %></a></td><td><%= cg.endpoints.count %></td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- /container -->
+
+    <div class="container">
+      <form  method="post">
+        <label>Add new Configuration Group</label>
+        <input class="form-control" type="text" name="name" id="group" placeholder="New Connfiguration Group">
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+  </body>
+</html>

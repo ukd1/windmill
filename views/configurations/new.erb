@@ -1,11 +1,79 @@
-<h1>Configuration group: <%= @cg.name %></h1>
-<h2>Create new configuration</h2>
-<form action="<%= "/configuration-groups/#{@cg.id}/configurations" %>" method="post">
-  Name: <input type="text" name="config[name]"><br>
-  Version: <input type="number" name="config[version]"><br>
-  Notes:<br>
-  <textarea name="config[notes]" rows=5></textarea><br>
-  Configuration JSON:<br>
-  <textarea name="config[config_json]" rows=20></textarea><br>
-  <button type="submit">Add</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  </head>
+  <body>
+
+    <div class="container">
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Windmill</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">New</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+    </div>
+
+    <div class="container">
+      <form>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="config[name]" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <label>Version</label>
+          <input type="text" class="form-control" id="exampleInputPassword1" name="config[version]" placeholder="0.0.1">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <!-- <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Password"> -->
+          <textarea class="form-control" name="config[notes]" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Configuration JSON</label>
+          <!-- <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Password"> -->
+          <textarea class="form-control" name="config[config_json]" rows="20"></textarea>
+        </div>
+        <button type="submit" class="btn btn-default">Add</button>
+      </form>
+    </div>
+
+    <!-- <div class="container">
+      <h1>Configuration group: <%= @cg.name %></h1>
+      <h2>Create new configuration</h2>
+      <form action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
+        Name: <input type="text" name="config[name]"><br>
+        Version: <input type="number" name="config[version]"><br>
+        Notes:<br>
+        <textarea name="config[notes]" rows=5></textarea><br>
+        Configuration JSON:<br>
+        <textarea name="config[config_json]" rows=20></textarea><br>
+        <button type="submit">Add</button>
+      </form>
+    </div> -->
+
+  </body>
+</html>
