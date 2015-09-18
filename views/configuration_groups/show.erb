@@ -41,29 +41,31 @@
       <h1>Configuration group: <%= @cg.name %></h1>
 
       <h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
-
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Version</th>
-            <th>Assignment Count</th>
-            <th>Endpoint Count</th>
-            <th>Default Config</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @cg.configurations.each do |config| %>
+      <form action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
+        <table class="table">
+          <thead>
             <tr>
-              <td><%= config.name %></td>
-              <td><%= config.version %></td>
-              <td><%= config.assigned_endpoints.count %></td>
-              <td><%= config.configured_endpoints.count %></td>
-              <td><input type="radio" name="default_config" value="<%= config.id %>" <%if @cg.default_config == config %>checked="checked"<% end %>/></td>
+              <th>Name</th>
+              <th>Version</th>
+              <th>Assignment Count</th>
+              <th>Endpoint Count</th>
+              <th>Default Config</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% @cg.configurations.each do |config| %>
+              <tr>
+                <td><%= config.name %></td>
+                <td><%= config.version %></td>
+                <td><%= config.assigned_endpoints.count %></td>
+                <td><%= config.configured_endpoints.count %></td>
+                <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <button type="submit" class="btn btn-default">Save</button>
+      </form>
 
       <a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
 

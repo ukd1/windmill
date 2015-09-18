@@ -70,6 +70,7 @@ namespace '/configuration-groups' do
   namespace '/:cg_id' do
     get do
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+      @default_config = @cg.default_config
       erb :"configuration_groups/show"
     end
 
