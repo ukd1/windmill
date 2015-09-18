@@ -85,6 +85,8 @@ namespace '/configuration-groups' do
       puts '########################################################'
       puts 'POST /assign'
       puts params
+      puts '########################################################'
+
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       params["assign_pct"].each do |key, value|
         if value != ""
@@ -94,9 +96,7 @@ namespace '/configuration-groups' do
           break
         end
       end
-      puts '########################################################'
-
-      redirect "/configuration-groups/#{params[:cg_id]}"
+      {status:"ok"}.to_json
     end
 
     namespace '/configurations' do
