@@ -81,6 +81,24 @@ namespace '/configuration-groups' do
       redirect "/configuration-groups/#{params[:cg_id]}"
     end
 
+    post '/assign' do
+      puts '########################################################'
+      puts 'POST /assign'
+      puts params
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+      params["assign_pct"].each do |key, value|
+        if value != ""
+          puts "Looks like you want to assign #{value} percent to #{key}"
+          @config = GuaranteedConfiguration.find(key)
+          @cg.assign_config_percent(@config, value.to_i)
+          break
+        end
+      end
+      puts '########################################################'
+
+      redirect "/configuration-groups/#{params[:cg_id]}"
+    end
+
     namespace '/configurations' do
       get '/new' do
         @cg = GuaranteedConfigurationGroup.find(params[:cg_id])

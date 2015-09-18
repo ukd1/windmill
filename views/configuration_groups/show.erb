@@ -50,6 +50,7 @@
               <th>Assignment Count</th>
               <th>Endpoint Count</th>
               <th>Default Config</th>
+              <th>Assign To</th>
             </tr>
           </thead>
           <tbody>
@@ -60,6 +61,7 @@
                 <td><%= config.assigned_endpoints.count %></td>
                 <td><%= config.configured_endpoints.count %></td>
                 <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
+                <td><input type="number" name=<%= "assign_pct[#{config.id}]"%>>%<button type="submit" formaction="<%= "/configuration-groups/#{@cg.id}/assign" %>">Assign</button></td>
               </tr>
             <% end %>
           </tbody>
