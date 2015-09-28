@@ -49,6 +49,7 @@ namespace '/api' do
       params.merge!(JSON.parse(request.body.read))
     rescue
     end
+    logdebug "value in node_key is #{params['node_key']}"
     client = GuaranteedEndpoint.find_by node_key: params['node_key']
     logdebug "Received endpoint: #{client.inspect}"
     client.get_config
