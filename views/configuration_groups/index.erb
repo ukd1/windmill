@@ -34,12 +34,14 @@
               <li class="active"><a href="#">Home</a></li>
               <li><a href="#">New</a></li>
             </ul>
+            <p class="navbar-text navbar-right"><%= "#{current_user} <a href=\"/logout\">(logout)</a>" %></p>
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </nav>
     </div>
 
     <div class="container">
+      <%= styled_flash %>
       <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">Endpoint Groups</div>

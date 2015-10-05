@@ -1,6 +1,10 @@
 require 'sinatra'
 require 'sinatra/namespace'
+require 'sinatra/flash'
 require 'json'
+require 'omniauth'
+require 'omniauth-github'
+require 'omniauth-heroku'
 require_relative 'lib/models/endpoint'
 require_relative 'lib/models/configuration'
 require_relative 'lib/models/configuration_group'
@@ -8,10 +12,32 @@ require_relative 'lib/models/enroller'
 
 NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
 
+use Rack::Session::Cookie
+use OmniAuth::Builder do
+  provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET']
+  provider :heroku, ENV['HEROKU_KEY'], ENV['HEROKU_SECRET'], fetch_info: true
+end
+
+helpers do
+  # define a current_user method, so we can be sure if an user is authenticated
+  def current_user
+    session[:email] || nil
+  end
+end
+
 def logdebug(message)
   if ENV['OSQUERYDEBUG']
     puts "\n" + caller_locations(1,1)[0].label + ": " + message
   end
+end
+
+configure do
+  set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
+end
+
+before do
+  pass if request.path_info =~ /^\/auth\//
+  redirect to('/auth/login') unless current_user
 end
 
 get '/status' do
@@ -20,6 +46,39 @@ end
 
 get '/' do
   redirect '/configuration-groups'
+end
+
+get '/auth/login' do
+  erb :"auth/login"
+end
+
+get '/auth/:provider/callback' do
+  logdebug JSON.pretty_generate(request.env['omniauth.auth'])
+  email = env['omniauth.auth']['info']['email']
+  if settings.authorized_users.include? email
+    session[:email] = email
+    flash[:notice] = "#{email} logged in successfully."
+    redirect to('/')
+  end
+  flash[:warning] = "#{email} logged in successfully but not authorized in authorized_users.txt"
+  redirect to('/auth/login')
+end
+
+get '/auth/failure' do
+  flash[:warning] = "Authentication failed."
+  redirect to('/auth/login')
+  # erb "<h1>Authentication Failed:</h1><h3>message:<h3> <pre>#{params}</pre>"
+end
+
+get '/auth/:provider/deauthorized' do
+  erb "#{params[:provider]} has deauthorized this app."
+end
+
+get '/logout' do
+  email = session[:email]
+  session[:email] = nil
+  flash[:notice] = "#{email} logged out successfully."
+  redirect to('/')
 end
 
 namespace '/api' do

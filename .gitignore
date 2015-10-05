@@ -25,6 +25,12 @@ build/
 /vendor/bundle
 /lib/bundler/man/
 
+## Temporary environment variables
+.env
+
+## Users that are authorized to access the app
+authorized_users.txt
+
 ## Ignore the SQLite database that gets used in dev and test
 /db/*.sqlite3
 
