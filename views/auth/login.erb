@@ -1,3 +1,9 @@
 <%= styled_flash %>
-<a href="/auth/github">Login with GitHub</a><br>
-<a href="/auth/heroku">Login with Heroku</a>
+<h2>The following providers are configued for authentication</h2>
+<% if ENV['GITHUB_KEY'] && ENV['GITHUB_SECRET'] %>
+  <a href="/auth/github">Login with GitHub</a><br>
+<% end %>
+
+<% if ENV['HEROKU_KEY'] && ENV['HEROKU_SECRET'] %>
+  <a href="/auth/heroku">Login with Heroku</a>
+<% end %>

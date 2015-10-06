@@ -10,6 +10,10 @@
     "NODE_ENROLL_SECRET": {
       "description": "A shared secret key for validating osquery endpoints.",
       "generator": "secret"
+    },
+    "COOKIE_SECRET": {
+      "description": "A secret used to encode cookies",
+      "generator": "secret"
     }
   }
 }
