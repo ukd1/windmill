@@ -13,7 +13,7 @@ require_relative 'lib/models/enroller'
 
 NODE_ENROLL_SECRET = ENV['NODE_ENROLL_SECRET'] || "valid_test"
 
-use Rack::Session::Cookie, secret: ENV['COOKIE_SECRET'] || SecureRandom.hex(64)
+use Rack::Session::Cookie, expire_after: 86_400, secret: ENV['COOKIE_SECRET'] || SecureRandom.hex(64)
 use OmniAuth::Builder do
   provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], scope: "user:email"
   provider :heroku, ENV['HEROKU_KEY'], ENV['HEROKU_SECRET'], fetch_info: true, scope: "identity"
