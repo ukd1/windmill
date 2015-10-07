@@ -1,7 +1,16 @@
 # osquery-tls-server
 
-A TLS endpoint for delivering osquery configuration files to nodes. The quickest
-way to get started is to click this button down here.
+## Why do you want this
+
+If you're running `osquery` you may want an easy-to-manage way of delivering
+configuration file updates to the osquery process on your running servers. This
+software provides a TLS server that delivers configuration to osquery and also
+allows you to roll out new configs to small samples of servers to make sure that
+the new config does not cause problem before deploying to all machines.
+
+## Getting started
+
+The quickest way to get started is to click this button down here.
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
@@ -9,14 +18,17 @@ If you deploy to Heroku using the button above, you'll need to view the
 environment variables to get the random secret that was generated for the NODE_ENROLL_SECRET
 used by the windmill application.
 
-## Compatibility
-
-This has been tested most recently against osquery version 1.5.1-59-g43cf5f1
-
-## Running the server
+## Not using Heroku
 
 For security purposes, the software requires new endpoints to supply a shared
-secret which is found in an environment variable named NODE_ENROLL_SECRET.
+secret which is found in an environment variable named `NODE_ENROLL_SECRET`.
+While  not completely necessary, you may want to set a random in an environment
+variabled  named `COOKIE_SECRET`. If you do not set `COOKIE_SECRET` then users
+will have to  re-authenticate every time you restart the server. Finally, since
+this was written by a Heroku employee intending to run this on Heroku if you run
+the app in production the code expects an environment variable named
+DATABASE_URL with a url pointing to a postgres database. Absent that variable,
+production mode will fall back to a postgres database on localhost.
 
 To run the server run the following commands. The first two commands should only
 need to be run once
@@ -33,10 +45,9 @@ If you want to use the faster puma server you can run the app with this command:
 puma -C puma.rb
 ```
 
-Since this was written by a Heroku employee intending to run this on Heroku if
-you run the app in production the code expects an environment variable named
-DATABASE_URL with a url pointing to a postgres database. Absent that variable,
-production mode will fall back to a postgres database on localhost.
+## Compatibility
+
+This has been tested most recently against osquery version 1.5.1-59-g43cf5f1
 
 ## Configuring osqueryd
 
@@ -70,6 +81,34 @@ lines that you may include in your osquery.flags file include:
 
 Then you can start osqueryd (on linux) with a simple `/etc/init.d/osqueryd start`
 or `service start osqueryd`
+
+## Authentication and logging in
+Users must authenticate to access the windmill UI. There is no local storage of
+user information, users must authenticate using an OAuth provider, such as
+Google or GitHub. You'll need to get an OAuth ID and an OAuth Secret from the
+provider of your choice.
+
+You also need to create a whitelist of allowed email addresses in a file named
+`authorized_users.txt`. If you're running windmill on Heroku one easy way to
+manage users without having merge problems from master is to create a separate
+branch named users, uncomment the line in `.gitignore` that hides
+`authorized_users.txt`.  Then populate your `authorized_users.txt` file. Finally
+you can `git push heroku users:master`
+
+Later you can switch back to master and git pull for updates. Then just go back
+to your user branch and `git rebase master`.
+
+### Authenticate with GitHub
+
+Populate an environment variable named `GITHUB_KEY` and a variable named
+`GITHUB_SECRET`. If *both*  of these variables are populated with a value, then
+the login with GitHub option  will be visible on the login page.
+
+### Authenticate with Heroku
+
+Populate an environment variable named `HEROKU_KEY` and a variable named
+`HEROKU_SECRET`. If *both*  of these variables are populated with a value, then
+the login with GitHub option  will be visible on the login page.
 
 ## Enrolling osquery endpoints
 The osquery endpoints will reach out to the TLS server and send a POST to `/api/enroll`
