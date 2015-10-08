@@ -52,7 +52,7 @@ get '/' do
 end
 
 get '/auth/login' do
-  erb :"auth/login"
+  erb :"auth/login", layout: :'login_layout'
 end
 
 get '/auth/:provider/callback' do

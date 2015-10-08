@@ -1,152 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+<div class="container">
+  <h1>Configuration group: <%= @cg.name %></h1>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
-  </head>
-  <body>
-
-    <div class="container">
-      <!-- Static navbar -->
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Windmill</a>
-          </div>
-          <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#">New</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div><!--/.container-fluid -->
-      </nav>
-    </div>
-
-    <div class="container">
-      <h1>Configuration group: <%= @cg.name %></h1>
-
-      <h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
-      <form id="configurationList" action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Version</th>
-              <th>Assignment Count</th>
-              <th>Endpoint Count</th>
-              <th>Default Config</th>
-              <th>Reassign To</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @cg.configurations.each do |config| %>
-              <tr>
-                <td><%= config.name %></td>
-                <td><%= config.version %></td>
-                <td><%= config.assigned_endpoints.count %></td>
-                <td><%= config.configured_endpoints.count %></td>
-                <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
-                <td><input type="number" name=<%= "assign_pct[#{config.id}]"%>>%<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Go</button></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-        <button type="submit" class="btn btn-default">Save</button>
-      </form>
-
-      <div class="modal fade" id="myModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">Reassign endpoints</h4>
-            </div>
-            <div class="modal-body">
-              <div class="media">
-                <div class="media-left media-top">
-                  <img class="media-object" src="/murica.jpg" />
-                </div>
-                <div class="media-body">
-                  <p>You are about to assign a different configuration to some of the
-                  osquery endpoints. These endpoints will receive the new configuration
-                  when they check in for a configuration update. Are you sure you
-                  want to do this?</p>
-                </div>
-              </div>
-            </div>
-            <div class="center-block">
-
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" id="beer">Hold my beer</button>
-            </div>
-          </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-      </div><!-- /.modal -->
-
-      <a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
-
-
-
-      <h2>Endpoints in this group (<%= @cg.endpoints.count %>)</h2>
-
-      <table class="table">
-        <thead>
+  <h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
+  <form id="configurationList" action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Version</th>
+          <th>Assignment Count</th>
+          <th>Endpoint Count</th>
+          <th>Default Config</th>
+          <th>Reassign To</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @cg.configurations.each do |config| %>
           <tr>
-            <th>Identifier</th>
-            <th>Osquery version</th>
-            <th>Config refresh count</th>
-            <th>Last ip address</th>
-            <th>Last config refresh</th>
-            <th>Assigned Configuration</th>
+            <td><%= config.name %></td>
+            <td><%= config.version %></td>
+            <td><%= config.assigned_endpoints.count %></td>
+            <td><%= config.configured_endpoints.count %></td>
+            <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
+            <td><input type="number" name=<%= "assign_pct[#{config.id}]"%>>%<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Go</button></td>
           </tr>
-        </thead>
-        <tbody>
-          <% @cg.endpoints.each do |endpoint| %>
-            <tr>
-              <td><%= endpoint.identifier %></td>
-              <td><%= endpoint.last_version %></td>
-              <td><%= endpoint.config_count %></td>
-              <td><%= endpoint.last_ip %></td>
-              <td><%= endpoint.last_config_time %></td>
-              <td><%= endpoint.assigned_config.name %></td>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-  </body>
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-  <script>
-    $("#beer").click(function() {
-      $.ajax({
-        type: "POST",
-        url: "<%= "/configuration-groups/#{@cg.id}/assign" %>",
-        data: $("#configurationList").serialize(),
-        dataType: "JSON",
-        success: function(data) {
-          location.reload();
-        },
-        error: function(data) {
-          console.log(data);
-          $("#myModal").modal("hide");
-        }
-      });
-    });
-  </script>
-</html>
+        <% end %>
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-default">Save</button>
+  </form>
+
+  <div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Reassign endpoints</h4>
+        </div>
+        <div class="modal-body">
+          <div class="media">
+            <div class="media-left media-top">
+              <img class="media-object" src="/murica.jpg" />
+            </div>
+            <div class="media-body">
+              <p>You are about to assign a different configuration to some of the
+              osquery endpoints. These endpoints will receive the new configuration
+              when they check in for a configuration update. Are you sure you
+              want to do this?</p>
+            </div>
+          </div>
+        </div>
+        <div class="center-block">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="beer">Hold my beer</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
+
+
+
+  <h2>Endpoints in this group (<%= @cg.endpoints.count %>)</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Identifier</th>
+        <th>Osquery version</th>
+        <th>Config refresh count</th>
+        <th>Last ip address</th>
+        <th>Last config refresh</th>
+        <th>Assigned Configuration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @cg.endpoints.each do |endpoint| %>
+        <tr>
+          <td><%= endpoint.identifier %></td>
+          <td><%= endpoint.last_version %></td>
+          <td><%= endpoint.config_count %></td>
+          <td><%= endpoint.last_ip %></td>
+          <td><%= endpoint.last_config_time %></td>
+          <td><%= endpoint.assigned_config.name %></td>
+      <% end %>
+    </tbody>
+  </table>
+</div>
