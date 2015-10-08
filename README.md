@@ -110,6 +110,19 @@ Populate an environment variable named `HEROKU_KEY` and a variable named
 `HEROKU_SECRET`. If *both*  of these variables are populated with a value, then
 the login with GitHub option  will be visible on the login page.
 
+### Authenticate with Google
+
+Populate an environment variable named `GOOGLE_ID` and a variable named
+`GOOGLE_SECRET`. If *both*  of these variables are populated with a value, then
+the login with Google option  will be visible on the login page.
+
+Special note, logging in with Google may require an extra step to avoid protocol mismatch if you use a service
+that runs your app unencrypted but uses a service in between to encrypt, such as
+Heroku. In those cases when you try to authenticate with google the requested
+callback address will not have the https. To fix this, you need to set yet
+another environment variable called `FULL_URL`. That should have the https address
+of your server, e.g. `https://yourserver.yourdomain.com`.
+
 ## Enrolling osquery endpoints
 The osquery endpoints will reach out to the TLS server and send a POST to `/api/enroll`
 with a `enroll_secret` value that it read from it's own filesystem (`/etc/osquery/osquery.secret`

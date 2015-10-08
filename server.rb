@@ -5,6 +5,7 @@ require 'json'
 require 'omniauth'
 require 'omniauth-github'
 require 'omniauth-heroku'
+require 'omniauth-google-oauth2'
 require 'securerandom'
 require_relative 'lib/models/endpoint'
 require_relative 'lib/models/configuration'
@@ -17,6 +18,11 @@ use Rack::Session::Cookie, expire_after: 86_400, secret: ENV['COOKIE_SECRET'] ||
 use OmniAuth::Builder do
   provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], scope: "user:email"
   provider :heroku, ENV['HEROKU_KEY'], ENV['HEROKU_SECRET'], fetch_info: true, scope: "identity"
+  provider :google_oauth2, ENV['GOOGLE_ID'], ENV['GOOGLE_SECRET'], name: 'google'
+end
+
+if ENV['FULL_URL']
+  OmniAuth.config.full_host = ENV['FULL_URL']
 end
 
 helpers do

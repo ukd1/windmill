@@ -13,6 +13,7 @@ gem 'sinatra-flash'
 gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-heroku'
+gem 'omniauth-google-oauth2'
 
 group :test, :development do
   gem 'sqlite3'
