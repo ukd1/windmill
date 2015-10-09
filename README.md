@@ -130,54 +130,58 @@ Populate an environment variable named `GOOGLE_ID` and a variable named
 `GOOGLE_SECRET`. If *both*  of these variables are populated with a value, then
 the login with Google option  will be visible on the login page.
 
-Special note, logging in with Google may require an extra step to avoid protocol mismatch if you use a service
-that runs your app unencrypted but uses a service in between to encrypt, such as
-Heroku. In those cases when you try to authenticate with google the requested
-callback address will not have the https. To fix this, you need to set yet
-another environment variable called `FULL_URL`. That should have the https address
-of your server, e.g. `https://yourserver.yourdomain.com`.
+Special note, logging in with Google may require an extra step to avoid protocol
+mismatch if you use a service that runs your app unencrypted but uses a service
+in between to encrypt, such as Heroku. In those cases when you try to
+authenticate with google the requested callback address will not have the https.
+To fix this, you need to set yet another environment variable called `FULL_URL`.
+That should have the https address of your server, e.g.
+`https://yourserver.yourdomain.com`.
 
 ## Enrolling osquery endpoints
-The osquery endpoints will reach out to the TLS server and send a POST to `/api/enroll`
-with a `enroll_secret` value that it read from it's own filesystem (`/etc/osquery/osquery.secret`
-if you followed the `osquery.flags` file above). The value in that file must match
-the node secret being used by the TLS server and specify a configuration group. The TLS server takes node secret value from an
-environment variable named NODE_ENROLL_SECRET. If you have not set that variable
-then it defaults to "valid_test".
 
-If the server sends a valid node_secret then it will be enrolled and joined to the configuration
-group that was specified. The endpoint will receive a node key that it
-can use to pull its configuration from the server.
+The osquery endpoints will reach out to the TLS server and send a POST to
+`/api/enroll` with a `enroll_secret` value that it read from it's own filesystem
+(`/etc/osquery/osquery.secret` if you followed the `osquery.flags` file above).
+The value in that file must match the node secret being used by the TLS server
+and specify a configuration group. The TLS server takes node secret value from
+an environment variable named NODE_ENROLL_SECRET. If you have not set that
+variable then it defaults to "valid_test".
 
-You can also store a host identifier for osquery endpoints by adding
-a host identifier to the front of the group label and enroll secret stored in `/etc/osquery/osquery.secret`.
-The values are separated by a colon.
+If the server sends a valid node_secret then it will be enrolled and joined to
+the configuration group that was specified. The endpoint will receive a node key
+that it can use to pull its configuration from the server.
+
+You can also store a host identifier for osquery endpoints by adding a host
+identifier to the front of the group label and enroll secret stored in
+`/etc/osquery/osquery.secret`. The values are separated by a colon.
 
 ### Example osquery.secret
 
-`www-1:web:bigrandomstringofcharactersforthewin`
+ `www-1:web:bigrandomstringofcharactersforthewin`
 
-That will label the endpoint with an identifier of `www-1` and join it to the `web`
-configuration group. From that point on it will receive the configuration file that
-the `web` configuration group assigns to that endpoint.
+That will label the endpoint with an identifier of `www-1` and join it to the
+`web` configuration group. From that point on it will receive the configuration
+file that the `web` configuration group assigns to that endpoint.
 
 If you enroll an endpoint with an invalid configuration group name or a missing
 configuration group name it will be added to the `default` configuration group.
 
 ## Serving configuration files
+
 Configuration files are kept in a database and are assigned to endpoints by the
 configuration group to which they belong. When the application is initialized a
-configuration group named `default` is created automatically and a default configuration
-file is added to that group.
+configuration group named `default` is created automatically and a default
+configuration file is added to that group.
 
 Additional configuration groups and configuration files can be added by pointing
-your browser at the root of the application. There you will find a GUI for adding
-new configuration groups and new configuration files.
+your browser at the root of the application. There you will find a GUI for
+adding new configuration groups and new configuration files.
 
-After an endpoint is enrolled it will make a POST request to /api/config and provide
-the node secret it was given when it enrolled. The Windmill server will look up that
-node secret and find the configuration file that is assigned to that endpoint and
-provide that back to the endpoint.
+After an endpoint is enrolled it will make a POST request to /api/config and
+provide the node secret it was given when it enrolled. The Windmill server will
+look up that node secret and find the configuration file that is assigned to
+that endpoint and provide that back to the endpoint.
 
 ## Helpful links
 
@@ -189,5 +193,4 @@ provide that back to the endpoint.
 The tests are written in RSpec and make use of the `rack-test` gem. If you do a
 `bundle install` you should have that.
 
-Then you can just run `rspec spec/` to run
-the tests.
+Then you can just run `rspec spec/` to run the tests.
