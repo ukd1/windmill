@@ -88,13 +88,27 @@ user information, users must authenticate using an OAuth provider, such as
 Google or GitHub. You'll need to get an OAuth ID and an OAuth Secret from the
 provider of your choice.
 
-You also need to create a whitelist of allowed email addresses in a file named
-`authorized_users.txt`. If you're running windmill on Heroku one easy way to
-manage users without having merge problems from master is to create a separate
-branch named users, uncomment the line in `.gitignore` that hides
-`authorized_users.txt`.  Then populate your `authorized_users.txt` file. Finally
-you can `git push heroku users:master`
+### Authorized Users
 
+You also need to create a whitelist of allowed email addresses.
+
+The prefered option is to set the environment variable `AUTHORIZEDUSERS` with a
+comma seperated list of email addresses.
+
+`export AUTHORIZEDUSERS=user1@example.com,user2@example.com`
+
+The secondary option is listing users in a file named `authorized_users.txt`.
+
+__Example:__ authorized\_users.txt
+
+```
+user1@example.com
+user2@example.com
+```
+> If you're running windmill on Heroku one easy way to manage users without having
+merge problems from master is to create a separate branch named users, uncomment
+the line in `.gitignore` that hides `authorized_users.txt`.  Then populate your
+`authorized_users.txt` file. Finally you can `git push heroku users:master`.
 Later you can switch back to master and git pull for updates. Then just go back
 to your user branch and `git rebase master`.
 
