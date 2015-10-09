@@ -39,7 +39,11 @@ def logdebug(message)
 end
 
 configure do
-  set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
+  if ENV['AUTHORIZEDUSERS']
+    set :authorized_users, ENV['AUTHORIZEDUSERS'].split(',')
+  else
+    set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
+  end
 end
 
 before do
