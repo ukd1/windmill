@@ -11,7 +11,9 @@
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-responsive.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Additional user-supplied stylesheets -->
+    <%= erb :additional_css rescue nil %>
 
   </head>
   <body>
@@ -45,4 +47,7 @@
 
     <%= yield %>
   </body>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <!-- Additional user-supplied javascript -->
+  <%= erb :additional_js rescue nil %>
 </html>

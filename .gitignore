@@ -31,6 +31,10 @@ build/
 ## Users that are authorized to access the app
 authorized_users.txt
 
+## User customization files
+/views/additional_css.erb
+/views/additional_js.erb
+
 ## Ignore the SQLite database that gets used in dev and test
 /db/*.sqlite3
 

@@ -194,3 +194,10 @@ The tests are written in RSpec and make use of the `rack-test` gem. If you do a
 `bundle install` you should have that.
 
 Then you can just run `rspec spec/` to run the tests.
+
+## Customizing the look and feel
+You can add additional stylesheets and javascript to the layout of the page by
+adding a file `views/additiona_css.erb` and `views/additonal_js.erb`. These are
+embedded ruby file which are rendered in the main layout. The stylesheet partial
+is rendered in the head of the html and the javascript is rendered after the
+closing body tag.
