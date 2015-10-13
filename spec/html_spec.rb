@@ -1,6 +1,5 @@
-require_relative '../server.rb'  # <-- your sinatra app
-require 'rspec'
-require 'rack/test'
+require 'spec_helper'
+
 
 describe 'The osquery TLS app' do
   include Rack::Test::Methods

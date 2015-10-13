@@ -5,8 +5,6 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'puma'
 gem 'json'
-gem 'rspec'
-gem 'rack-test'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 gem 'sinatra-flash'
@@ -18,6 +16,9 @@ gem 'omniauth-google-oauth2'
 group :test, :development do
   gem 'sqlite3'
   gem 'database_cleaner'
+  gem 'rspec'
+  gem 'rack-test'
+  gem 'capybara'
 end
 
 group :production do

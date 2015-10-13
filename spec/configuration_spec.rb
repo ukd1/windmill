@@ -1,7 +1,4 @@
-require 'rspec'
-require 'rack/test'
 require 'spec_helper'
-require_relative '../server.rb'
 
 describe "osquery configuration files" do
   before do
