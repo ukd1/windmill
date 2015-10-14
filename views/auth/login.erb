@@ -1,17 +1,30 @@
-<h2>The following providers are configued for authentication</h2>
-
+<div class="page-header">
+  <h1>Login <small>Using your favorite OAuth provider</small></h1>
+</div>
 <% if ENV['GITHUB_KEY'] && ENV['GITHUB_SECRET'] %>
-  <a href="/auth/github" class="btn btn-block btn-social btn-github">
-    <i class="fa fa-github"></i> Sign in with GitHub
-  </a>
+  <div class="row login-div">
+    <div class="text-center">
+      <a href="/auth/github" class="btn btn-lg btn-social btn-github">
+        <i class="fa fa-github"></i> Sign in with GitHub
+      </a>
+    </div>
+  </div>
 <% end %>
 
 <% if ENV['HEROKU_KEY'] && ENV['HEROKU_SECRET'] %>
-  <a href="/auth/heroku">Login with Heroku</a><br>
+  <div class="row login-div">
+    <div class="text-center">
+      <a href="/auth/heroku" class="btn btn-lg btn-primary">Login with Heroku</a><br>
+    </div>
+  </div>
 <% end %>
 
 <% if ENV['GOOGLE_ID'] && ENV['GOOGLE_SECRET'] %>
-  <a href="/auth/heroku" class="btn btn-block btn-social btn-google">
-    <i class="fa fa-google"></i> Sign in with Google
-  </a>
+  <div class="row login-div">
+    <div class="text-center">
+      <a href="/auth/heroku" class="btn btn-lg btn-social btn-google">
+        <i class="fa fa-google"></i> Sign in with Google
+      </a>
+    </div>
+  </div>
 <% end %>
