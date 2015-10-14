@@ -32,13 +32,58 @@ describe "osquery configuration groups" do
     expect(@configs.length).to be > 0
   end
 
-  it "should return the last configuration if no default_config is set" do
-    expect(@cg.default_config).to eq(@config2)
+  it "should return the first configuration if no default_config is set" do
+    expect(@cg.default_config).to eq(@config)
   end
 
   it "should allow you to set a different default_config" do
     @cg.default_config = @config
     expect(@cg.default_config).to eq(@config)
+  end
+
+  it "should allow you to set a configuration as the canary deploy" do
+    @cg.canary_config = @config2
+    expect(@cg.canary_config).to eq(@config2)
+  end
+
+  it "should know if a canary deployment is in progress" do
+    expect(@cg.canary_in_progress?).to be_falsey
+    @cg.canary_config = @config2
+    expect(@cg.canary_in_progress?).to be_truthy
+  end
+
+  it "should not allow you to set a canary deployment if one is in progress" do
+    @cg.canary_config = @config2
+    expect {@cg.canary_config = @config }.to raise_error(RuntimeError)
+    expect(@cg.canary_config).to eq(@config2)
+  end
+
+  it "should cancel a canary deploy and set all endpoints back to default" do
+    # Without specifying, @config is the default configuration for @cg
+    # We will start a canary and assign @endpoint the new config
+    # then cancel the canary and check if @endpoint has been reassigned
+    @cg.canary_config = @config2
+    @cg.assign_config_percent(@config2, 100)
+    @cg.cancel_canary
+    expect(@cg.canary_in_progress?).to be_falsey
+    expect(@endpoint.assigned_config).to eq(@config)
+  end
+
+  it "should throw an error if you try to cancel a canary when one isn't in progress" do
+
+  end
+
+  it "should promote a canary to default and set all endpoints to the new config" do
+    @cg.canary_config = @config2
+    @cg.promote_canary
+    @endpoint.reload
+    expect(@cg.canary_in_progress?).to be_falsey
+    expect(@cg.default_config).to eq(@config2)
+    expect(@endpoint.assigned_config).to eq(@config2)
+  end
+
+  it "should throw an error if you try to promote a canary when one isn't in progress" do
+
   end
 
 end

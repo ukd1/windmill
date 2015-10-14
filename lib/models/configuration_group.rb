@@ -12,12 +12,38 @@ class ConfigurationGroup < ActiveRecord::Base
 
 
   def default_config
-    config_id = self.default_config_id || self.configurations.last
+    config_id = self.default_config_id || self.configurations.first
     GuaranteedConfiguration.find(config_id)
   end
 
   def default_config=(in_config)
     self.default_config_id = in_config.id
+  end
+
+  def canary_config
+    GuaranteedConfiguration.find(self.canary_config_id)
+  end
+
+  def canary_config=(in_config)
+    if self.canary_in_progress?
+      raise "Canary currently in progress. Cancel existing canary before setting a canary"
+    end
+    self.canary_config_id = in_config.id
+  end
+
+  def canary_in_progress?
+    !!self.canary_config_id
+  end
+
+  def cancel_canary
+    self.assign_config_percent(self.default_config, 100)
+    self.canary_config_id = nil
+  end
+
+  def promote_canary
+    self.assign_config_percent(self.canary_config, 100)
+    self.default_config = self.canary_config
+    self.canary_config_id = nil
   end
 
   def assign_config_percent(config, in_percent)
@@ -35,6 +61,11 @@ class ConfigurationGroup < ActiveRecord::Base
       return false
     end
 
+    total_assignment_count = (self.endpoints.count * in_percent / 100.0).to_i
+    self.assign_config_count(config, total_assignment_count)
+  end
+
+  def assign_config_count(config, in_count)
     # Here are the endpoints that already have the config being assigned
     already_done = self.endpoints.where(assigned_config: config)
 
@@ -45,7 +76,7 @@ class ConfigurationGroup < ActiveRecord::Base
     all_endpoints = already_done + remaining
 
     # now get the front of the whole list and assign configurations
-    all_endpoints[0..(all_endpoints.count * (in_percent/100.0)).to_i].each do |e|
+    all_endpoints[0..in_count].each do |e|
       e.assigned_config = config
       e.save
     end
