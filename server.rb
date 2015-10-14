@@ -57,6 +57,13 @@ before do
   redirect to('/auth/login') unless current_user
 end
 
+helpers do
+  def bootflash
+    remapper = {notice: "alert alert-info", success: "alert alert-success", warning: "alert alert-danger"}
+    flash.collect {|k, v| "<div class=\"#{remapper[k]}\">#{v}</div>"}.join
+  end
+end
+
 get '/status' do
   "running at #{Time.now}"
 end
@@ -99,13 +106,6 @@ namespace '/auth' do
     redirect to('/')
   end
 end
-
-
-
-
-
-
-
 
 namespace '/api' do
   get '/status' do
