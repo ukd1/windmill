@@ -11,7 +11,7 @@
           <th>Assignment Count</th>
           <th>Endpoint Count</th>
           <th>Default Config</th>
-          <th>Reassign To</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -22,7 +22,17 @@
             <td><%= config.assigned_endpoints.count %></td>
             <td><%= config.configured_endpoints.count %></td>
             <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
-            <td><input type="number" name=<%= "assign_pct[#{config.id}]"%>>%<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">Go</button></td>
+            <td>
+              <% if @cg.canary_in_progress? %>
+                <% if @cg.canary_config == config %>
+                  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-edit"> Canary</i></button>
+                <% else %>
+                  <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#myModal" disabled>Canary</button>
+                <% end %>
+              <% else %>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-play"> Canary</i></button>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
