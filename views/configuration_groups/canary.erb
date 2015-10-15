@@ -1,0 +1,24 @@
+<div class="container">
+  <h1>Canary Deployment</h1>
+  <p>A canary deployment allows you to configure a random selection of endpoints
+    with a new osquery configuration and verify that the new configuration will
+    not create performance problems before promoting the canary to the default
+    configuration.</p>
+
+  <h1>Configuration group: <%= @cg.name %></h1>
+  <p><strong>Current default configuration: </strong><%= @cg.default_config.name %> version: <%= @cg.default_config.version %></p>
+  <p><strong>Canary Deploying: </strong><%= @newconfig.name %> version: <%= @newconfig.version %></p>
+  <form method="post">
+    <input type="radio" name="method" value="count"> Deploy to a set number of endpoints: <input type="number" name="count"><br>
+    <input type="radio" name="method" value="percent"> Deploy to a percentage of endpoints: <input type="number" name="percent"><br>
+    <input type="submit" value="do it">
+    <% if @cg.canary_in_progress? %>
+      <br>
+      <a href="<%= "../../#{@cg.id}/canary/cancel" %>" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-thumbs-down"> Cancel Canary</i></a>
+      <br>
+      <a href="<%= "../../#{@cg.id}/canary/promote" %>" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-thumbs-up"> Promote Canary</i></a>
+    <% end %>
+    <br>
+    <a href="<%= "../../#{@cg.id}" %>" type="button" class="btn btn-info btn-sm"><i class="glyphicon glyphicon-step-backward">Back</i></a>
+  </form>
+</div>

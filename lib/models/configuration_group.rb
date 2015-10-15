@@ -29,6 +29,7 @@ class ConfigurationGroup < ActiveRecord::Base
       raise "Canary currently in progress. Cancel existing canary before setting a canary"
     end
     self.canary_config_id = in_config.id
+    self.save
   end
 
   def canary_in_progress?
@@ -38,12 +39,14 @@ class ConfigurationGroup < ActiveRecord::Base
   def cancel_canary
     self.assign_config_percent(self.default_config, 100)
     self.canary_config_id = nil
+    self.save
   end
 
   def promote_canary
     self.assign_config_percent(self.canary_config, 100)
     self.default_config = self.canary_config
     self.canary_config_id = nil
+    self.save
   end
 
   def assign_config_percent(config, in_percent)

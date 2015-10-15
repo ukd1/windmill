@@ -25,13 +25,6 @@ if ENV['FULL_URL']
   OmniAuth.config.full_host = ENV['FULL_URL']
 end
 
-helpers do
-  # define a current_user method, so we can be sure if an user is authenticated
-  def current_user
-    session[:email] || nil
-  end
-end
-
 def logdebug(message)
   if ENV['OSQUERYDEBUG']
     puts "\n" + caller_locations(1,1)[0].label + ": " + message
@@ -58,6 +51,10 @@ before do
 end
 
 helpers do
+  def current_user
+    session[:email] || nil
+  end
+
   def bootflash
     remapper = {notice: "alert alert-info", success: "alert alert-success", warning: "alert alert-danger"}
     flash.collect {|k, v| "<div class=\"#{remapper[k]}\">#{v}</div>"}.join
@@ -157,6 +154,9 @@ namespace '/configuration-groups' do
     get do
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       @default_config = @cg.default_config
+      if @cg.canary_in_progress?
+        flash[:notice] = "Canary deployment in progress."
+      end
       erb :"configuration_groups/show"
     end
 
@@ -167,12 +167,53 @@ namespace '/configuration-groups' do
       redirect "/configuration-groups/#{params[:cg_id]}"
     end
 
-    post '/assign' do
-      puts '########################################################'
-      puts 'POST /assign'
-      puts params
-      puts '########################################################'
+    namespace '/canary' do
+      get '/cancel' do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+        @cg.cancel_canary
+        flash[:success] = "Cancelled the canary configuration and reassigned endpoints to default"
+        redirect "/configuration-groups/#{params[:cg_id]}"
+      end
 
+      get '/promote' do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+        @cg.promote_canary
+        flash[:success] = "Promoted the canary configuration to default and reassigned remaining endpoints"
+        redirect "/configuration-groups/#{params[:cg_id]}"
+      end
+
+      get '/:config_id' do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+
+        # Not using GuaranteedConfiguration here because if you try to assign
+        # a missing config as the canary we need to throw an error
+        @newconfig = Configuration.find(params[:config_id])
+        erb :"configuration_groups/canary"
+      end
+
+      post '/:config_id' do
+        @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+
+        # Not using GuaranteedConfiguration here because if you try to assign
+        # a missing config as the canary we need to throw an error
+        @newconfig = Configuration.find(params[:config_id])
+        if params['method'] == 'count'
+          @cg.assign_config_count(@newconfig, params['count'].to_i)
+          @cg.canary_config = @newconfig
+          flash[:success] = "Assigned #{@newconfig.name} version #{@newconfig.version} to #{params['count']} endpoints."
+        elsif params['method'] == 'percent'
+          @cg.assign_config_percent(@newconfig, params['percent'].to_i)
+          @cg.canary_config = @newconfig
+          flash[:success] = "Assigned #{@newconfig.name} version #{@newconfig.version} to #{params['percent']}% of endpoints."
+        else
+          flash[:warning] = "No valid method provided"
+        end
+          redirect "/configuration-groups/#{params[:cg_id]}"
+      end
+    end
+
+
+    post '/assign' do
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       params["assign_pct"].each do |key, value|
         if value != ""
