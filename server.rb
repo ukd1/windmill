@@ -155,7 +155,7 @@ namespace '/configuration-groups' do
       @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
       @default_config = @cg.default_config
       if @cg.canary_in_progress?
-        flash[:notice] = "Canary deployment in progress."
+        flash.now[:notice] = "Canary deployment in progress."
       end
       erb :"configuration_groups/show"
     end
@@ -188,6 +188,10 @@ namespace '/configuration-groups' do
         # Not using GuaranteedConfiguration here because if you try to assign
         # a missing config as the canary we need to throw an error
         @newconfig = Configuration.find(params[:config_id])
+        if @cg.canary_in_progress?
+          flash.now[:notice] = "Canary deployment in progress."
+        end
+        
         erb :"configuration_groups/canary"
       end
 
