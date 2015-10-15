@@ -12,13 +12,56 @@
     <input type="radio" name="method" value="count"> Deploy to a set number of endpoints: <input type="number" name="count"><br>
     <input type="radio" name="method" value="percent"> Deploy to a percentage of endpoints: <input type="number" name="percent"><br>
     <input type="submit" value="do it">
-    <% if @cg.canary_in_progress? %>
-      <br>
-      <a href="<%= "../../#{@cg.id}/canary/cancel" %>" type="button" class="btn btn-danger btn-sm"><i class="glyphicon glyphicon-thumbs-down"> Cancel Canary</i></a>
-      <br>
-      <a href="<%= "../../#{@cg.id}/canary/promote" %>" type="button" class="btn btn-success btn-sm"><i class="glyphicon glyphicon-thumbs-up"> Promote Canary</i></a>
-    <% end %>
-    <br>
     <a href="<%= "../../#{@cg.id}" %>" type="button" class="btn btn-info btn-sm"><i class="glyphicon glyphicon-step-backward">Back</i></a>
   </form>
+  <% if @cg.canary_in_progress? %>
+    <br>
+    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#promoteModal"><i class="glyphicon glyphicon-thumbs-up"> Promote Canary</i></button>
+    <br>
+    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancelModal"><i class="glyphicon glyphicon-thumbs-down"> Cancel Canary</i></button>
+  <% end %>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="promoteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Promote Canary Deployment</h4>
+      </div>
+      <div class="modal-body">
+        Promoting the canary deployment means that you're satisfied with the results
+        and you wish to run the new configuration on every endpoint in this configuration
+        group. If you proceed, every endpoint will be assigned the new configuration and
+        the canary deployment will be closed out. Are you sure you wish to proceed?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <a href="<%= "../../#{@cg.id}/canary/promote" %>" class="btn btn-danger">Promote Canary</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Cancel Canary Deployment</h4>
+      </div>
+      <div class="modal-body">
+        Cancelling the canary deployment means that you wish to undo the deployment of
+        the new configuration. If you proceed, every endpoint running the new configuration
+        will be reassigned the default configuration and the canary deployment will be
+        closed out. Are you sure you wish to proceed?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <a href="<%= "../../#{@cg.id}/canary/cancel" %>" class="btn btn-danger">Cancel Canary</a>
+      </div>
+    </div>
+  </div>
 </div>

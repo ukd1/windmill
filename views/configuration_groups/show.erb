@@ -2,7 +2,6 @@
   <h1>Configuration group: <%= @cg.name %></h1>
 
   <h2>Configuration files in this group (<%= @cg.configurations.count %>)</h2>
-  <form id="configurationList" action="<%= "/configuration-groups/#{@cg.id}" %>" method="post">
     <table class="table">
       <thead>
         <tr>
@@ -21,7 +20,7 @@
             <td><%= config.version %></td>
             <td><%= config.assigned_endpoints.count %></td>
             <td><%= config.configured_endpoints.count %></td>
-            <td><input type="radio" name="default_config" value="<%= config.id %>" <% if @default_config == config %>checked="checked"<% end %>/></td>
+            <td><input type="radio" name="default_config" value="<%= config.id %>" disabled <% if @default_config == config %>checked="checked"<% end %>/></td>
             <td>
               <% if @cg.canary_in_progress? %>
                 <% if @cg.canary_config == config %>
@@ -41,8 +40,6 @@
         <% end %>
       </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Save</button>
-  </form>
 
 
   <a href="<%= "/configuration-groups/#{@cg.id}/configurations/new" %>">Add new configuration</a>
