@@ -197,13 +197,18 @@ namespace '/configuration-groups' do
         # Not using GuaranteedConfiguration here because if you try to assign
         # a missing config as the canary we need to throw an error
         @newconfig = Configuration.find(params[:config_id])
+
+        if @cg.canary_in_progress? and @cg.canary_config != @newconfig
+          flash[:warning] = "Cannot assign endpoints because a different canary is in progress"
+          redirect "/configuration-groups/#{params[:cg_id]}"
+        end
         if params['method'] == 'count'
           @cg.assign_config_count(@newconfig, params['count'].to_i)
-          @cg.canary_config = @newconfig
+          @cg.canary_config = @newconfig unless @cg.canary_in_progress?
           flash[:success] = "Assigned #{@newconfig.name} version #{@newconfig.version} to #{params['count']} endpoints."
         elsif params['method'] == 'percent'
           @cg.assign_config_percent(@newconfig, params['percent'].to_i)
-          @cg.canary_config = @newconfig
+          @cg.canary_config = @newconfig unless @cg.canary_in_progress?
           flash[:success] = "Assigned #{@newconfig.name} version #{@newconfig.version} to #{params['percent']}% of endpoints."
         else
           flash[:warning] = "No valid method provided"
