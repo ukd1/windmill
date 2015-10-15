@@ -69,17 +69,22 @@ class ConfigurationGroup < ActiveRecord::Base
   end
 
   def assign_config_count(config, in_count)
+    number_todo = [in_count, self.endpoints.count].min
+    puts '##########################################'
+    puts '##########################################'
+    puts "number_todo = #{number_todo}"
     # Here are the endpoints that already have the config being assigned
-    already_done = self.endpoints.where(assigned_config: config)
+    already_done = self.endpoints.where(assigned_config: config).count
+    puts "already_done = #{already_done}"
+
+    number_todo = number_todo - already_done
+    puts "Leaving #{number_todo} yet to be done."
 
     # Shuffle the rest of the endpoints
-    remaining = self.endpoints.except(assigned_config: config).shuffle
-
-    # merge the two collections
-    all_endpoints = already_done + remaining
+    remaining = self.endpoints.where.not(assigned_config: config).shuffle
 
     # now get the front of the whole list and assign configurations
-    all_endpoints[0..in_count].each do |e|
+    remaining[0..number_todo].each do |e|
       e.assigned_config = config
       e.save
     end
