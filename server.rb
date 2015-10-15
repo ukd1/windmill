@@ -45,7 +45,7 @@ configure do
     begin
       set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
     rescue
-      raise ArgumentError, "No ENV or file for authroized users. See: https://github.com/heroku/windmill#authentication-and-logging-in"
+      raise ArgumentError, "No ENV or file for authorized users. See: https://github.com/heroku/windmill#authentication-and-logging-in"
     end
   end
 end
