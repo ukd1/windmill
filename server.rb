@@ -267,6 +267,18 @@ namespace '/configuration-groups' do
           @config.errors.messages.to_s
         end
       end
+
+      delete '/:config_id' do
+        @config = GuaranteedConfiguration.find(params[:config_id])
+        begin
+          @config.destroy
+          flash[:success] = "Configuration #{@config.name} successfully deleted."
+        rescue RuntimeError => error
+          flash[:warning] = "Unable to delete #{@config.name}: " + error.message
+        ensure
+          redirect "/configuration-groups/#{params[:cg_id]}"
+        end
+      end
     end
   end
 end

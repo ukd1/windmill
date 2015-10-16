@@ -35,6 +35,12 @@
                   <a href="<%= @cg.id %>/canary/<%= config.id %>" type="button" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-play"> Canary</i></a>
                 <% end %>
               <% end %>
+              <% if config.assigned_endpoints.count == 0 && @cg.default_config != config %>
+                <form action="<%= "#{@cg.id}/configurations/#{config.id}" %>" method="POST">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <input type="submit" class="btn btn-sm btn-danger" value="delete">
+                </form>
+              <% end %>
             </td>
           </tr>
         <% end %>
