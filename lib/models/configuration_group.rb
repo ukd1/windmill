@@ -10,6 +10,16 @@ class ConfigurationGroup < ActiveRecord::Base
   has_many :configurations
   has_many :endpoints
 
+  before_destroy do
+    if self.endpoints.count > 0
+      raise "Cannot delete ConfigurationGroup while it has endpoints"
+    end
+
+    if self.name == "default"
+      raise "Cannot delete the default configuration group"
+    end
+  end
+
 
   def default_config
     config_id = self.default_config_id || self.configurations.first

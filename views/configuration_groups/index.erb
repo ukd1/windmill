@@ -16,7 +16,17 @@
           <tr>
             <td><a href="<%= "/configuration-groups/#{cg.id}" %>"><%= cg.name %></a>
               <% if cg.canary_in_progress? %><span class="label label-info">canary</span><% end %></td>
-            <td><%= cg.endpoints.count %></td>
+            <td>
+              <% if cg.endpoints.count == 0 %>
+                <% if cg.name != "default" %>
+                  <form action="<%= "/configuration-groups/#{cg.id}" %>" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="submit" class="btn btn-sm btn-danger" value="delete">
+                  </form>
+                <% end %>
+              <% else %>
+                <%= cg.endpoints.count %>
+              <% end %>
           </tr>
         <% end %>
       </tbody>

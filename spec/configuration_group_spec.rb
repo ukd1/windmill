@@ -88,4 +88,8 @@ describe "osquery configuration groups" do
     expect {@cg.promote_canary}.to raise_error(RuntimeError)
   end
 
+  it "should throw an error if you try to delete a configuration group that has endpoints" do
+    expect {@cg.destroy}.to raise_error(RuntimeError)
+  end
+
 end

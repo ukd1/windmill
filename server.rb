@@ -169,6 +169,18 @@ namespace '/configuration-groups' do
       redirect "/configuration-groups/#{params[:cg_id]}"
     end
 
+    delete do
+      @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
+      begin
+        @cg.destroy
+        flash[:success] = "#{@cg.name} deleted successfully"
+      rescue RuntimeError => error
+        flash[:warning] = "Unable to delete #{@cg.name}: " + error.message
+      ensure
+        redirect "/configuration-groups"
+      end
+    end
+
     namespace '/canary' do
       get '/cancel' do
         @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
