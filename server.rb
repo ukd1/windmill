@@ -32,13 +32,15 @@ def logdebug(message)
 end
 
 configure do
-  if ENV['AUTHORIZEDUSERS']
-    set :authorized_users, ENV['AUTHORIZEDUSERS'].split(',')
-  else
-    begin
-      set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
-    rescue
-      raise ArgumentError, "No ENV or file for authorized users. See: https://github.com/heroku/windmill#authentication-and-logging-in"
+  if ENV['RACK_ENV'] != 'test'
+    if ENV['AUTHORIZEDUSERS']
+      set :authorized_users, ENV['AUTHORIZEDUSERS'].split(',')
+    else
+      begin
+        set :authorized_users, File.open('authorized_users.txt').readlines.map {|line| line.strip}
+      rescue
+        raise ArgumentError, "No ENV or file for authorized users. See: https://github.com/heroku/windmill#authentication-and-logging-in"
+      end
     end
   end
 end
@@ -191,7 +193,7 @@ namespace '/configuration-groups' do
         if @cg.canary_in_progress?
           flash.now[:notice] = "Canary deployment in progress."
         end
-        
+
         erb :"configuration_groups/canary"
       end
 

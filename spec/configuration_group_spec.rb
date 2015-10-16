@@ -70,7 +70,9 @@ describe "osquery configuration groups" do
   end
 
   it "should throw an error if you try to cancel a canary when one isn't in progress" do
-
+    @cg.canary_config = @config2
+    expect {@cg.canary_config = @config}.to raise_error(RuntimeError)
+    expect(@cg.canary_in_progress?).to be_truthy
   end
 
   it "should promote a canary to default and set all endpoints to the new config" do
@@ -83,7 +85,7 @@ describe "osquery configuration groups" do
   end
 
   it "should throw an error if you try to promote a canary when one isn't in progress" do
-
+    expect {@cg.promote_canary}.to raise_error(RuntimeError)
   end
 
 end

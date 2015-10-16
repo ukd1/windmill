@@ -43,6 +43,9 @@ class ConfigurationGroup < ActiveRecord::Base
   end
 
   def promote_canary
+    if !self.canary_in_progress?
+      raise "No canary in progress. Cannot promote what doesn't exist."
+    end
     self.assign_config_percent(self.canary_config, 100)
     self.default_config = self.canary_config
     self.canary_config_id = nil
@@ -70,15 +73,11 @@ class ConfigurationGroup < ActiveRecord::Base
 
   def assign_config_count(config, in_count)
     number_todo = [in_count, self.endpoints.count].min
-    puts '##########################################'
-    puts '##########################################'
-    puts "number_todo = #{number_todo}"
+
     # Here are the endpoints that already have the config being assigned
     already_done = self.endpoints.where(assigned_config: config).count
-    puts "already_done = #{already_done}"
 
     number_todo = number_todo - already_done
-    puts "Leaving #{number_todo} yet to be done."
 
     # Shuffle the rest of the endpoints
     remaining = self.endpoints.where.not(assigned_config: config).shuffle
