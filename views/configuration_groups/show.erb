@@ -16,7 +16,7 @@
       <tbody>
         <% @cg.configurations.each do |config| %>
           <tr>
-            <td><%= config.name %></td>
+            <td><a href="<%= "#{@cg.id}/configurations/#{config.id}/edit" %>"><%= config.name %></a></td>
             <td><%= config.version %></td>
             <td><%= config.assigned_endpoints.count %></td>
             <td><%= config.configured_endpoints.count %></td>

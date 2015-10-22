@@ -268,6 +268,31 @@ namespace '/configuration-groups' do
         end
       end
 
+      get '/:config_id/edit' do
+        @config = GuaranteedConfiguration.find(params[:config_id])
+        erb :"configurations/edit"
+      end
+
+      post '/:config_id' do
+        @config = Configuration.find(params[:config_id])
+        @config.name = params[:name]
+        @config.version = params[:version]
+        @config.notes = params[:notes]
+
+        if @config.assigned_endpoints.count == 0
+          @config.config_json = params[:config_json]
+        end
+
+        if @config.save
+          flash[:notice] = "Changes saved"
+          redirect "/configuration-groups/#{params[:cg_id]}"
+        else
+          flash[:warning] = "Unable to save configuration. #{@config.errors.messages.to_s}"
+          redirect "/configuration-groups/#{params[:cg_id]}/configurations/#{params[:config_id]}/edit"
+        end
+
+      end
+
       delete '/:config_id' do
         @config = GuaranteedConfiguration.find(params[:config_id])
         begin

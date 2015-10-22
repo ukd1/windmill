@@ -1,0 +1,32 @@
+<div class="container">
+  <form action="<%= "/configuration-groups/#{@config.configuration_group.id}/configurations/#{@config.id}" %>" method="POST">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="form-control" name="name" value="<%= @config.name %>">
+    </div>
+    <div class="form-group">
+      <label>Version</label>
+      <input type="text" class="form-control" name="version" value="<%= @config.version %>">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-control" name="notes" rows="5"><%= @config.notes %></textarea>
+    </div>
+    <% if @config.assigned_endpoints.count > 0 %>
+      <div class="alert alert-info"><strong>Cannot edit config:</strong> This configuration is in use
+      on some endpoints and editing it would cause that change to go out to those endpoints without the
+      safety of a canary deployment.</div>
+      <div class="form-group">
+        <label>Configuration JSON</label>
+        <!-- <textarea class="form-control" name="config[config_json]" rows="20"><%= @config.config_json %></textarea> -->
+        <pre><code><%= @config.config_json %></code></pre>
+      </div>
+    <% else %>
+      <div class="form-group">
+        <label>Configuration JSON</label>
+        <textarea class="form-control" name="config_json" rows=20><%= @config.config_json %></textarea>
+      </div>
+    <% end %>
+    <button type="submit" class="btn btn-default">Update</button>
+  </form>
+</div>
