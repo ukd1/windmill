@@ -28,11 +28,14 @@ class Endpoint < ActiveRecord::Base
     end
   end
 
-  def get_config
+  def get_config(params={})
     logdebug "returning json from configuration_id #{self.assigned_config.id}"
       self.config_count += 1
       self.last_config_time = Time.now
       self.last_config = self.assigned_config
+      if params[:user_agent]
+        self.last_version = params[:user_agent]
+      end
       self.save
       self.assigned_config.config_json
   end

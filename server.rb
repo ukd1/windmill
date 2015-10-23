@@ -137,7 +137,7 @@ namespace '/api' do
     logdebug "value in node_key is #{params['node_key']}"
     client = GuaranteedEndpoint.find_by node_key: params['node_key']
     logdebug "Received endpoint: #{client.inspect}"
-    client.get_config
+    client.get_config user_agent: request.user_agent
   end
 
 end

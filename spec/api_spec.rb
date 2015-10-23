@@ -134,4 +134,12 @@ describe 'The osquery TLS api' do
     expect(json).to have_key("node_invalid")
     expect(json["node_invalid"]).to eq(true)
   end
+
+  it "updates an endpoints version from the user agent string" do
+    @endpoint = Endpoint.last
+    old_agent = @endpoint.last_version
+    post '/api/config', {node_key: @endpoint.node_key}, {'HTTP_USER_AGENT' => "version2"}
+    @endpoint.reload
+    expect(@endpoint.last_version).to eq("version2")
+  end
 end
