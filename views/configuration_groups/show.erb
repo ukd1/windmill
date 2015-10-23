@@ -72,7 +72,7 @@
           <td><%= endpoint.last_version %></td>
           <td><%= endpoint.config_count %></td>
           <td><%= endpoint.last_ip %></td>
-          <td><%= endpoint.last_config_time %></td>
+          <td><%= endpoint.last_config_time %> (<%= difftime(endpoint.last_config_time, DateTime.now) %>)</td>
           <td><%= endpoint.assigned_config.name %></td>
       <% end %>
     </tbody>

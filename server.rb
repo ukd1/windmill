@@ -8,6 +8,7 @@ require 'omniauth-heroku'
 require 'omniauth-google-oauth2'
 require 'securerandom'
 require 'encrypted_cookie'
+require 'time_difference'
 require_relative 'lib/models/endpoint'
 require_relative 'lib/models/configuration'
 require_relative 'lib/models/configuration_group'
@@ -61,6 +62,19 @@ helpers do
   def bootflash
     remapper = {notice: "alert alert-info", success: "alert alert-success", warning: "alert alert-danger"}
     flash.collect {|k, v| "<div class=\"#{remapper[k]}\">#{v}</div>"}.join
+  end
+
+  def difftime(oldtime, newtime)
+    oldtime = oldtime || DateTime.now
+    diff = TimeDifference.between(oldtime, newtime).in_each_component
+    returnstring = "never"
+    diff.each do |key, value|
+      if value >= 1
+        returnstring = "#{value.to_i} #{key.to_s.singularize.pluralize(value.to_i)}"
+        break
+      end
+    end
+    returnstring
   end
 end
 
