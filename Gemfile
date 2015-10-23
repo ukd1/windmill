@@ -12,6 +12,7 @@ gem 'omniauth'
 gem 'omniauth-github'
 gem 'omniauth-heroku'
 gem 'omniauth-google-oauth2'
+gem 'encrypted_cookie'
 
 group :test, :development do
   gem 'sqlite3'
