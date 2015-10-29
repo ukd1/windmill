@@ -128,14 +128,23 @@ namespace '/api' do
 
   namespace '/configurations' do
     # CRUD CONFIG
+    get do
+      Configuration.all.to_json
+    end
   end
 
   namespace '/configuration_groups' do
     # CRUD CONFIG_GROUPS
+    get do
+      ConfigurationGroup.all.to_json
+    end
   end
 
   namespace '/endpoints' do
     # CRUD ENDPOINTS
+    get do
+      Endoint.all.to_json
+    end
   end
 
   namespace '/enroll' do
