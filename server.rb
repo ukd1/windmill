@@ -141,9 +141,31 @@ namespace '/api' do
   end
 
   namespace '/endpoints' do
-    # CRUD ENDPOINTS
+    post do
+      # Create: Not necessary.
+      {'Error': 'Endpoint creation via the Windmill API is not supported.'}.to_json
+    end
+
     get do
-      Endoint.all.to_json
+      # Read All Endpoints - Known Bug: Fails with no endpoints in the DB
+      Endpoint.all.to_json
+    end
+
+    get '/:endpoint_id' do
+      # Read endpoint by ID
+      Endpoint.find(params['endpoint_id']).to_json
+    end
+
+    post '/:endpoint' do
+      # Update Endpoint: Unsupported and not planning to be.
+      {'Message': 'Endpoint updating via the Windmill API is not supported.'}.to_json
+    end
+
+    delete '/:endpoint_id' do
+      # Delete: Gotta think about this one.
+      @e = Endpoint.find(params['endpoint_id'])
+      @e.destroy
+      {'status': 'deleted', 'endpoint': @e}.to_json
     end
   end
 
