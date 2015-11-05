@@ -128,6 +128,12 @@ namespace '/api' do
 
   namespace '/configurations' do
     # CRUD CONFIG
+
+    post '/new' do
+      # Create a new configureation
+    end
+
+    # Read All
     get do
       Configuration.all.to_json
     end
