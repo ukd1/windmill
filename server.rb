@@ -162,6 +162,7 @@ namespace '/api' do
   namespace '/configuration_groups' do
     # CRUD CONFIG_GROUPS
     get do
+      # Read All
       ConfigurationGroup.all.to_json
     end
 
@@ -175,14 +176,12 @@ namespace '/api' do
         {'status': 'configuration group not found'}.to_json
       end
     end
-
-
   end
 
   namespace '/endpoints' do
     post do
       # Create: Not necessary.
-      {'Error': 'Endpoint creation via the Windmill API is not supported.'}.to_json
+      {'Error': 'endpoint creation via the Windmill API is not supported'}.to_json
     end
 
     get do
@@ -201,7 +200,7 @@ namespace '/api' do
 
     post '/:endpoint' do
       # Update Endpoint: Unsupported and not planning to be.
-      {'Message': 'Endpoint updating via the Windmill API is not supported.'}.to_json
+      {'status': 'endpoint updating via the Windmill API is not supported'}.to_json
     end
 
     delete '/:endpoint_id' do
@@ -289,6 +288,7 @@ namespace '/configuration-groups' do
     end
 
     namespace '/canary' do
+
       get '/cancel' do
         @cg = GuaranteedConfigurationGroup.find(params[:cg_id])
         @cg.cancel_canary
