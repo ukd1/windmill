@@ -131,6 +131,32 @@ namespace '/api' do
     get do
       Configuration.all.to_json
     end
+
+    # Read One
+    get '/:configuration_id' do
+      begin
+        Configuration.find(params['configuration_id']).to_json
+      rescue
+        {'status': 'configuration not found'}.to_json
+      end
+    end
+
+    patch '/:configuration_id' do
+      # Update
+      {'Error': 'Configuration modification via the Windmill API is not supported.'}.to_json
+    end
+
+    delete '/:configuration_id' do
+      # Delete: Gotta think about this one
+
+      begin
+        @e = Endpoint.find(params['configuration_id'])
+        @e.destroy
+        {'status': 'deleted'}.to_json
+      rescue
+        {'status': 'configuration not found'}.to_json
+      end
+    end
   end
 
   namespace '/configuration_groups' do
@@ -138,6 +164,19 @@ namespace '/api' do
     get do
       ConfigurationGroup.all.to_json
     end
+
+    get '/:configuration_group_id' do
+      # Read One
+      begin
+        @e = ConfigruationGroup.find(params['configuration_group_id'])
+        @e.destroy
+        {'status': 'deleted'}.to_json
+      rescue
+        {'status': 'configuration group not found'}.to_json
+      end
+    end
+
+
   end
 
   namespace '/endpoints' do
@@ -152,8 +191,12 @@ namespace '/api' do
     end
 
     get '/:endpoint_id' do
-      # Read endpoint by ID
-      Endpoint.find(params['endpoint_id']).to_json
+      # Read One
+      begin
+        Endpoint.find(params['endpoint_id']).to_json
+      rescue
+        {'status': 'endpoint not found'}.to_json
+      end
     end
 
     post '/:endpoint' do
@@ -163,9 +206,13 @@ namespace '/api' do
 
     delete '/:endpoint_id' do
       # Delete: Gotta think about this one.
-      @e = Endpoint.find(params['endpoint_id'])
-      @e.destroy
-      {'status': 'deleted', 'endpoint': @e}.to_json
+      begin
+        @e = Endpoint.find(params['endpoint_id'])
+        @e.destroy
+        {'status': 'deleted'}.to_json
+      rescue
+        {'status': 'endpoint not found'}.to_json
+      end
     end
   end
 
