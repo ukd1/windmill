@@ -169,13 +169,9 @@ namespace '/api' do
     # CRUD CONFIG_GROUPS
 
     post '/new' do
-      # Create New Configuration Group
+      # WIP: Create New Configuration Group
 
       @cg = ConfigurationGroup.create(name: params[:name])
-      @cg.default_config = GuaranteedConfiguration.find(params[:default_config_id])
-      @cg.canary_config = GuaranteedConfiguration.find(params[:canary_config_id])
-      @cg.save
-
       {'status': 'created', 'configuration_group': @cg}.to_json
     end
 
